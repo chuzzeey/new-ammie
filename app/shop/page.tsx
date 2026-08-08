@@ -12,7 +12,14 @@ import { useCart } from "@/components/providers/cart-context"
 import { useProducts, type ShopProduct } from "@/hooks/use-products"
 import { supabase } from "@/lib/supabase"
 
-const categories = ["all", "wigs", "extensions", "lace"]
+const categories = ["all", "ready_to_ship_braided_wigs", "preorder_wigs", "human_hair_wigs"] as const
+
+const categoryLabels: Record<string, string> = {
+  all: "All products/Wigs",
+  ready_to_ship_braided_wigs: "Ready to ship braided wigs",
+  preorder_wigs: "Preorder wigs",
+  human_hair_wigs: "Human hair wigs",
+}
 
 const formatUsdPrice = (value: number | string) =>
   new Intl.NumberFormat("en-US", {
@@ -149,6 +156,8 @@ function ShopPageContent() {
     ? products
     : products.filter(p => p.category === selectedCategory)
 
+  const selectedCategoryLabel = categoryLabels[selectedCategory] || selectedCategory
+
   // Track window width for responsive products per page
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
@@ -275,22 +284,33 @@ function ShopPageContent() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex justify-center mb-8 md:mb-12">
-            <div className="inline-flex bg-card rounded-full p-1 gap-1">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                    selectedCategory === category
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+          <div className="mb-8 md:mb-12">
+            <div className="w-full max-w-xs md:max-w-sm">
+              <label htmlFor="shop-category-select" className="mb-2 block text-left text-sm font-medium text-foreground">
+                Categories
+              </label>
+              <div className="relative">
+                <select
+                  id="shop-category-select"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-3 pr-10 text-left text-sm font-medium text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  {category === "all" ? "All" : category.charAt(0).toUpperCase() + category.slice(1)}
-                </button>
-              ))}
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {categoryLabels[category]}
+                    </option>
+                  ))}
+                </select>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                >
+                  <path d="M5.25 7.5 10 12.25 14.75 7.5H5.25Z" />
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -298,7 +318,7 @@ function ShopPageContent() {
           <div className="mb-6">
             <p className="text-sm text-muted-foreground">
               Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
-              {selectedCategory !== "all" && ` in ${selectedCategory}`}
+              {selectedCategory !== "all" && ` in ${selectedCategoryLabel}`}
             </p>
           </div>
 

@@ -25,5 +25,5 @@ export const emptyForm: ProductForm = {
   rating: "0",
   reviewCount: "",
   description: "",
-  category: "wigs"
+  category: "ready_to_ship_braided_wigs"
 }

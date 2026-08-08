@@ -23,7 +23,7 @@ export interface ProductListResult {
  * @returns Product list result with data and error
  * 
  * @example
- * const { data, error } = await getProducts({ category: 'wigs', limit: 10 })
+ * const { data, error } = await getProducts({ category: 'ready_to_ship_braided_wigs', limit: 10 })
  */
 export async function getProducts(options: ProductListOptions = {}): Promise<ProductListResult> {
   try {
@@ -76,7 +76,7 @@ export async function getProducts(options: ProductListOptions = {}): Promise<Pro
  * const { data, error } = await createProduct({
  *   name: 'Wig 1',
  *   price: 15000,
- *   category: 'wigs',
+ *   category: 'ready_to_ship_braided_wigs',
  *   images: ['video.mp4', 'img1.jpg'],
  *   rating: 4.5,
  *   review_count: 10,

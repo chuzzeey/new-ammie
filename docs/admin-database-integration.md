@@ -68,7 +68,7 @@ CREATE TABLE products (
   price DECIMAL(10, 2) NOT NULL,
   original_price DECIMAL(10, 2),
   badge TEXT, -- 'Bestseller', 'Sale', 'New', etc.
-  category TEXT NOT NULL, -- 'wigs', 'extensions', 'lace'
+  category TEXT NOT NULL CHECK (category IN ('ready_to_ship_braided_wigs', 'preorder_wigs', 'human_hair_wigs')),
   images TEXT[], -- Array of Cloudinary URLs
   sizes TEXT, -- e.g., "14 inches, 18 inches, 22 inches"
   rating DECIMAL(2, 1) DEFAULT 5.0,

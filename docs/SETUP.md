@@ -46,7 +46,7 @@ This has already been done.
 
 1. In Supabase dashboard, go to **SQL Editor**
 2. Click **New query**
-3. Copy the entire contents of `lib/supabase-schema.sql`
+3. Copy the entire contents of `lib/supabase/full-schema.sql`
 4. Paste into the SQL editor
 5. Click **Run** (or press Ctrl+Enter)
 6. You should see "Success. No rows returned"
@@ -238,14 +238,11 @@ Currently, you manually paste Cloudinary URLs. To add upload functionality:
 
 ## Next Steps
 
-1. **Add category selector** to the form (currently hardcoded to "wigs")
-2. **Add badge selector** to the form (Bestseller, Sale, New, etc.)
-3. **Implement search functionality** (filter products by name/description)
-4. **Add pagination** if you have 100+ products
-5. **Add image upload** button to upload directly to Cloudinary
-6. **Add admin authentication** to secure the page
-7. **Add loading skeletons** for better UX
-8. **Add error boundaries** for better error handling
+1. **Implement search functionality** (filter products by name/description)
+2. **Add pagination** if you have 100+ products
+3. **Add image upload** button to upload directly to Cloudinary
+4. **Add loading skeletons** for better UX
+5. **Add error boundaries** for better error handling
 
 ---
 
@@ -257,7 +254,7 @@ ammie-store/
 ├── .env.local.example                  # Example env file
 ├── lib/
 │   ├── supabase.ts                     # Supabase client & types
-│   └── supabase-schema.sql             # Database schema
+│   └── supabase/full-schema.sql        # Complete database schema
 ├── app/admin/
 │   ├── page.tsx                        # Admin page with CRUD
 │   └── components/

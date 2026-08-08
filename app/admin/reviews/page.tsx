@@ -11,7 +11,7 @@ import { Header } from "@/components/layout/header"
 import { ReviewCard } from "@/components/sections/review-card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { supabase } from "@/lib/supabase"
-import { reviews as initialReviews, type Review, type ReviewComment } from "@/components/sections/reviews-data"
+import { reviews as initialReviews, normalizeReviewComment, type Review, type ReviewComment } from "@/components/sections/reviews-data"
 import { uploadToCloudinary, isVideoUrl } from "@/lib/cloudinary"
 import { ConfirmationModal } from "@/components/shared/confirmation-modal"
 

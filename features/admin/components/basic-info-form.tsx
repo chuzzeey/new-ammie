@@ -36,9 +36,9 @@ export default function BasicInfoForm({ name, badge, description, category, onCh
             onChange={(e) => onChange("category", e.target.value)}
             className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer pr-8"
           >
-            <option value="wigs">Wigs</option>
-            <option value="extensions">Extensions</option>
-            <option value="lace">Lace</option>
+            <option value="ready_to_ship_braided_wigs">Ready to ship braided wigs</option>
+            <option value="preorder_wigs">Preorder wigs</option>
+            <option value="human_hair_wigs">Human hair wigs</option>
           </select>
           <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
         </div>

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS products (
   price DECIMAL(10, 2) NOT NULL,
   images TEXT[] NOT NULL DEFAULT '{}',
   badge TEXT,
-  category TEXT NOT NULL CHECK (category IN ('wigs', 'extensions', 'lace')),
+  category TEXT NOT NULL CHECK (category IN ('ready_to_ship_braided_wigs', 'preorder_wigs', 'human_hair_wigs')),
   sizes TEXT,
   rating DECIMAL(2, 1) DEFAULT 5.0,
   review_count INTEGER DEFAULT 0,
