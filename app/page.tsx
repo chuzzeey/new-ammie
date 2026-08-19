@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header"
 import { Hero } from "@/components/sections/hero"
 import { TrustBadges } from "@/components/sections/trust-badges"
 import { FeatureSection } from "@/components/sections/feature-section"
+import { HeadSizeChart } from "@/components/sections/head-size-chart"
 import { ProductGrid } from "@/components/product/product-grid"
 import { ReviewsSection } from "@/components/sections/reviews-section"
 import { Newsletter } from "@/components/sections/newsletter"
@@ -32,6 +33,7 @@ export default function HomePage() {
       <Hero />
       <TrustBadges />
       <ProductGrid />
+      <HeadSizeChart />
       <FeatureSection />
       <ReviewsSection />
       <Newsletter />

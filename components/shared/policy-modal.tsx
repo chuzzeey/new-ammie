@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { X } from "lucide-react"
+import { X, Copy, Check } from "lucide-react"
 
 type ModalType = "privacy" | "terms" | "shipping"
 
@@ -13,91 +13,135 @@ interface PolicyModalProps {
 const content: Record<ModalType, { title: string; body: string }> = {
   privacy: {
     title: "Privacy Policy",
-    body: `Your privacy is important to us. At Ammie N, we are committed to protecting the personal information you share with us.
+    body: `We respect your privacy and are committed to protecting the personal information you provide when using our website or placing an order.
 
 Information We Collect
-We collect information you provide directly to us, such as your name, email address, phone number, and shipping address when you place an order or contact us. We also automatically collect certain data when you visit our site, including your IP address, browser type, and browsing behavior.
+Information provided by customers may include information necessary to process orders, provide customer support, arrange delivery, and communicate with customers regarding their purchases.
 
 How We Use Your Information
-We use your information to process orders, improve your shopping experience, send updates about your order, and provide customer support. With your consent, we may also send promotional emails about new products or offers.
+Customer information should only be used for legitimate business purposes related to providing our products and services.
 
 Data Security
-Your data is secured using industry-standard encryption and security protocols. We do not sell, trade, or share your personal information with third parties except as necessary to fulfill your orders (e.g., shipping carriers) or as required by law.
-
-Transparency
-We believe in full transparency. You have the right to access, update, or delete your personal data at any time. Contact us if you have any questions about how your data is handled.
-
-Cookies
-Our site uses cookies to enhance your browsing experience and analyze site traffic. You can control cookie preferences through your browser settings.
-
-Third-Party Services
-We may use trusted third-party services (payment processors, analytics, shipping) that adhere to strict data protection standards. These services are contractually obligated to keep your data secure.
-
-Policy Updates
-We may update this policy from time to time. Changes will be posted on this page. By continuing to use our site, you accept any updates to this policy.
+We take reasonable steps to protect customer information and maintain the security of information submitted through our website.
 
 Contact
-If you have questions about this Privacy Policy, please contact us at +2349031560905 {WhatsApp}.`
+Customers should contact our customer service team if they have questions regarding their personal information or its use.
+
+Customer service email: amysglamroom@gmail.com`
   },
   terms: {
     title: "Terms of Service",
-    body: `Welcome to Ammie N. By using our website and purchasing our products, you agree to the following terms and conditions.
+    body: `By using our website or placing an order, you agree to the store's current terms, policies, and conditions.
 
-General
-All products displayed on our website are subject to availability. We reserve the right to modify or discontinue any product without prior notice. Prices are subject to change without notice.
+Customers are responsible for reviewing product information, sizing information, order details, shipping information, and applicable return or exchange conditions before completing an order.
 
-Orders
-When you place an order, you agree to provide accurate and complete information. We reserve the right to cancel or refuse any order at our discretion. Order confirmation does not constitute acceptance of the order until payment has been processed.
+Once an order is placed and processed, the applicable processing, shipping, return, exchange, and product policies will apply.
 
-Payments
-We accept major credit cards, debit cards, and other payment methods as displayed at checkout. Payment is due at the time of purchase. All transactions are processed securely through trusted payment gateways.
+Custom Orders
+Custom wigs are subject to specific processing requirements because they are made according to the customer's requested specifications. Due to the hygienic nature of hair products and the labor involved in custom wig construction, custom wigs are final sale except where the specific "Our Error" policy applies. Custom wigs cannot be returned simply because the customer changes their mind or no longer wants the product.
 
-Intellectual Property
-All content on this website — including text, images, logos, and designs — is the property of Ammie N and is protected by copyright laws. You may not reproduce, distribute, or use any content without our written permission.
+Altered Units and Sale Items
+All sales of altered units and sale items are final. These items are not eligible for the standard ready to ship return and exchange policy.
 
-User Conduct
-You agree not to use our website for any unlawful purpose or in any way that could damage, disable, or impair the site. You may not attempt to gain unauthorized access to any part of our systems.
+Ready to Ship Wigs
+Eligible ready to ship wigs may be returned for store credit or exchanged within 7 days of delivery. A 25% restocking fee applies. The security tag must remain fully intact. The lace must completely remain uncut. The wig must be completely unworn. The wig must be free from perfumes, smoke, glue, or other smells. The customer is responsible for tracked return shipping.
 
-Limitation of Liability
-Ammie N shall not be held liable for any indirect, incidental, or consequential damages arising from the use or inability to use our products or website, to the fullest extent permitted by law.
+Return Process
+To request a return, customers must contact amysglamroom@gmail.com or use the WhatsApp contact option. Once the return is approved, the customer will receive the return shipping address and a Return Authorization Number. The package must be mailed back within 3 business days of receiving approval. Once received, the returned unit will be inspected. Customers should allow 3 to 5 business days after the returned unit is received for the inspection and processing of the applicable store credit or exchange.
 
-Product Care
-Hair products require proper care to maintain quality. Follow the care instructions provided with your purchase. Ammie N is not responsible for damage resulting from improper care or handling.
+Damaged or Defective Items
+Customers must inspect their package immediately after delivery. If an item arrives damaged or defective, the customer must contact amysglamroom@gmail.com within 48 hours of delivery. The customer must provide: Order number, clear photos of the damaged shipping box, and clear photos or videos showing the specific defect. Customers must not cut the lace, alter the unit, or throw away the packaging before the claim is reviewed. Valid claims will receive a complimentary replacement at a 40% discount with no additional delivery cost. Claims submitted after 48 hours or without the required photographic proof will not be accepted.
 
-Modifications
-We reserve the right to update these terms at any time. Changes will be effective immediately upon posting. Continued use of the site after changes constitutes acceptance of the new terms.
+Our Error Policy
+If the store sends the wrong item, the customer may qualify for a resolution under the "Our Error" policy. Qualifying errors are strictly limited to: Wrong Item Sent — the customer received a completely different wig style or texture from what is listed on the original invoice. Wrong Cap Size Sent — the customer ordered a specific cap size but received a different cap size. This policy applies to custom orders and does not apply to ready to ship or sale items.
 
-Governing Law
-These terms are governed by the laws of the Federal Republic of Nigeria. Any disputes shall be resolved in the applicable courts.`
+To qualify, the customer must contact the store within 48 hours of delivery through amysglamroom@gmail.com or WhatsApp. The customer must provide the order number, clear photos, and a video of the unboxing. The security tag must remain fully intact and attached. The lace must remain completely uncut. The wig must remain unworn and unaltered.
+
+If the store confirms that the error was made by the store, prepaid return shipping will be provided and a replacement will be issued after the returned unit is received and inspected.
+
+The store does not cover return costs for units that have been cut, styled, glued, or altered by the customer or a stylist.`
   },
   shipping: {
     title: "Shipping Policy",
-    body: `At Ammie N, we strive to deliver your orders promptly and safely.
+    body: `All deliveries are handled by DHL and are door to door.
 
-Processing Time
-Orders are processed within 1–3 business days after payment confirmation. Orders placed on weekends or public holidays will be processed on the next business day.
+Ready to Deliver Wigs
+Ready to deliver wigs are processed within 3 to 5 business days. After processing, standard shipping takes approximately 5 to 7 business days after delivery depending on the customer's location.
 
-Shipping Methods & Delivery
-We offer reliable shipping options tailored to your location. Estimated delivery times vary based on your region and selected shipping method at checkout.
+Custom Orders
+Processing time for custom orders varies depending on the requested style. Customers should allow the applicable processing time before the order is shipped.
+
+Express Shipping
+Express shipping is available at checkout for customers who require faster delivery. Express shipping is available at an additional cost.
 
 Shipping Rates
-Shipping costs are calculated at checkout based on your delivery address and chosen shipping method. Free shipping may be available on qualifying orders as advertised.
+Shipping rates vary depending on the customer's location and the weight of the order. The exact shipping cost will be displayed at checkout before the customer completes the order.
 
-Order Tracking
-Once your order is shipped, you will receive a confirmation email with a tracking number. You can track your package directly through the carrier's website.
+Free Shipping
+Free shipping is available for orders over $800. Free shipping does not apply to wholesale or bulk orders.
 
-Delivery Issues
-If your package is lost or damaged during transit, please contact us within 48 hours of delivery. We will work with the carrier to resolve the issue promptly.
+Tracking
+All deliveries are handled through DHL. Tracking numbers will be provided after the order has been processed.
 
-International Shipping
-International orders may be subject to customs duties, taxes, and import fees. These are the responsibility of the customer and are not included in the purchase price.
-
-Address Accuracy
-Please ensure your shipping address is correct at the time of order. Ammie N is not responsible for packages delivered to an incorrect address provided by the customer.
-
-Contact
-For any shipping-related inquiries, reach out to us at +2349031560905 {WhatsApp}.`
+Customer Service
+For any shipping-related inquiries, reach out to us at amysglamroom@gmail.com.`
   }
+}
+
+const EMAIL_REGEX = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g
+
+function EmailLink({ email }: { email: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText(email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea")
+      textarea.value = email
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5 align-middle">
+      <a
+        href={`mailto:${email}`}
+        className="font-bold text-primary hover:text-primary/80 underline underline-offset-2 boty-transition"
+      >
+        {email}
+      </a>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 boty-transition cursor-pointer"
+        aria-label={`Copy ${email}`}
+        title="Copy email"
+      >
+        {copied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+      </button>
+    </span>
+  )
+}
+
+function renderWithEmails(text: string) {
+  const parts = text.split(EMAIL_REGEX)
+  return parts.map((part, index) => {
+    if (EMAIL_REGEX.test(part)) {
+      return <EmailLink key={index} email={part} />
+    }
+    return <span key={index}>{part}</span>
+  })
 }
 
 export function PolicyModal({ type, onClose }: PolicyModalProps) {
@@ -105,7 +149,6 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
 
   useEffect(() => {
     if (type) {
-      // Trigger entrance animation on next frame
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
@@ -119,7 +162,6 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
       if (e.key === "Escape") handleClose()
     }
     document.addEventListener("keydown", handleEscape)
-    // Prevent body scroll when modal is open
     document.body.style.overflow = "hidden"
 
     return () => {
@@ -130,7 +172,7 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
 
   function handleClose() {
     setVisible(false)
-    setTimeout(onClose, 300) // Wait for exit animation
+    setTimeout(onClose, 300)
   }
 
   if (!type) return null
@@ -139,7 +181,6 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-[100] backdrop-blur-sm bg-black/30 transition-all duration-300 ${
           visible ? "opacity-100" : "opacity-0"
@@ -147,7 +188,6 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
         onClick={handleClose}
       />
 
-      {/* Modal */}
       <div
         className={`fixed inset-0 z-[101] flex items-center justify-center p-4 transition-all duration-300 ${
           visible ? "opacity-100 scale-100" : "opacity-0 scale-75"
@@ -157,10 +197,10 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
           className="bg-card rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto boty-shadow hide-scrollbar"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="sticky top-0 bg-card z-10 flex items-center justify-between p-6 pb-4 border-b border-border/50">
-            <h2 className="font-serif text-2xl text-foreground">{title}</h2>
+            <h2 className="text-lg font-bold text-foreground">{title}</h2>
             <button
+              type="button"
               onClick={handleClose}
               className="w-8 h-8 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition"
               aria-label="Close"
@@ -169,12 +209,11 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
             </button>
           </div>
 
-          {/* Body */}
           <div className="p-6 pt-4">
             {body.split("\n\n").map((paragraph, i) => {
               const lines = paragraph.split("\n")
-              const isHeading = lines.length === 1 && lines[0].length < 40 && !lines[0].endsWith(".")
-              
+              const isHeading = lines.length === 1 && lines[0].length < 50 && !lines[0].endsWith(".") && !lines[0].includes("@")
+
               if (isHeading) {
                 return (
                   <h3 key={i} className="font-medium text-foreground mt-5 mb-2 first:mt-0">
@@ -185,21 +224,7 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
 
               return (
                 <p key={i} className="text-sm text-muted-foreground leading-relaxed mb-4 last:mb-0">
-                  {paragraph.includes("+2349031560905") ? (
-                    <>
-                      {paragraph.replace(/\+2349031560905 \{WhatsApp\}/, "")}
-                      <a
-                        href="https://wa.me/2349031560905?text=Hello!%20I%20have%20a%20question%20about%20your%20policies."
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary/80 underline underline-offset-2 boty-transition"
-                      >
-                        +2349031560905 {`{WhatsApp}`}
-                      </a>
-                    </>
-                  ) : (
-                    paragraph
-                  )}
+                  {renderWithEmails(paragraph)}
                 </p>
               )
             })}

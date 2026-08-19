@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, Minus, Plus, ChevronDown, Leaf, Heart, Award, Recycle, Star, Check, Play, MessageCircle, User } from "lucide-react"
+import { ChevronLeft, Minus, Plus, ChevronDown, Leaf, Heart, Award, Recycle, Star, Check, Play, MessageCircle, User, Copy } from "lucide-react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { useCart } from "@/components/providers/cart-context"
@@ -30,6 +30,61 @@ const formatUsdPrice = (value: number | string) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(Number(value) || 0)
+
+const EMAIL_REGEX = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g
+
+function EmailLink({ email }: { email: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText(email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      const textarea = document.createElement("textarea")
+      textarea.value = email
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5 align-middle">
+      <a
+        href={`mailto:${email}`}
+        className="font-bold text-primary hover:text-primary/80 underline underline-offset-2 boty-transition"
+      >
+        {email}
+      </a>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 boty-transition cursor-pointer"
+        aria-label={`Copy ${email}`}
+        title="Copy email"
+      >
+        {copied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+      </button>
+    </span>
+  )
+}
+
+function renderWithEmails(text: string) {
+  const parts = text.split(EMAIL_REGEX)
+  return parts.map((part, index) => {
+    if (EMAIL_REGEX.test(part)) {
+      return <EmailLink key={index} email={part} />
+    }
+    return <span key={index}>{part}</span>
+  })
+}
 
 type AccordionSection = "details" | "howToUse" | "ingredients" | "delivery"
 
@@ -71,6 +126,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
   const [preloaded, setPreloaded] = useState(false)
   const [showCommentsModal, setShowCommentsModal] = useState(false)
   const [productComments, setProductComments] = useState<ReviewComment[]>([])
+  const [isHeadSizeChartOpen, setIsHeadSizeChartOpen] = useState(false)
 
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
@@ -158,6 +214,23 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
     setSelectedImageIndex(0)
     setPreloaded(false)
   }, [productId])
+
+  // Close head size chart lightbox on Escape key
+  useEffect(() => {
+    if (!isHeadSizeChartOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsHeadSizeChartOpen(false)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    // Prevent body scroll while lightbox is open
+    document.body.style.overflow = "hidden"
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      document.body.style.overflow = ""
+    }
+  }, [isHeadSizeChartOpen])
 
   const realImages = product
     ? product.images.filter((img) => img && img.trim() !== "")
@@ -279,7 +352,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
   }
 
   const defaultDeliveryText =
-    "Nationwide delivery in 5–7 business days. Lagos and Port Harcourt orders typically arrive in 2–3 business days. Returns are accepted within 7 days of delivery for unused items in original packaging — contact us to start a return."
+    "All deliveries are handled by DHL and are door to door. Ready to deliver wigs are processed within 3 to 5 business days, then standard shipping takes 5 to 7 business days. To start a return, email amysglamroom@gmail.com within 7 days of delivery. Ready to ship wigs are eligible for store credit or exchange, subject to a 25% restocking fee. The security tag must be fully intact, the lace must be uncut, the wig must be completely unworn, and the unit must be free from perfumes, smoke, glue, or other smells. The customer is responsible for tracked return shipping."
 
   const accordionItems: { key: AccordionSection; title: string; content: string }[] = [
     { key: "delivery", title: "Delivery & Returns", content: defaultDeliveryText }
@@ -488,6 +561,25 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
                   Buy Now
                 </button>
               </div>
+              {/* Head Size Chart */}
+              <div className="mb-8">
+                <span className="text-sm tracking-[0.3em] uppercase text-primary mb-3 block">
+                  Head Size Chart
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsHeadSizeChartOpen(true)}
+                  className="block w-full rounded-2xl overflow-hidden boty-shadow bg-card p-3 cursor-zoom-in boty-transition hover:opacity-90"
+                  aria-label="Zoom head size chart"
+                >
+                  <img
+                    src="https://res.cloudinary.com/deafv5ovi/image/upload/v1787176685/WhatsApp_Image_2026-08-17_at_1.36.04_PM_nwcmdq.jpg"
+                    alt="Ammie Hair head size chart"
+                    className="w-full h-auto object-contain rounded-xl"
+                  />
+                </button>
+              </div>
+
               <div className="border-t border-border/50">
                 {accordionItems.map((item) => (
                   <div key={item.key} className="border-b border-border/50">
@@ -496,7 +588,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
                       <ChevronDown className={`w-5 h-5 text-muted-foreground boty-transition ${openAccordion === item.key ? "rotate-180" : ""}`} />
                     </button>
                     <div className={`overflow-hidden boty-transition ${openAccordion === item.key ? "max-h-96 pb-5" : "max-h-0"}`}>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{item.content}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{renderWithEmails(item.content)}</p>
                     </div>
                   </div>
                 ))}
@@ -537,6 +629,38 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
         </section>
       )}
       
+      {/* Head Size Chart Lightbox */}
+      {isHeadSizeChartOpen && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-md flex items-center justify-center p-4 md:p-10"
+          onClick={() => setIsHeadSizeChartOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Head size chart zoomed view"
+        >
+          <div
+            className="relative max-w-4xl w-full max-h-[90vh] overflow-auto rounded-2xl bg-white p-3 md:p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setIsHeadSizeChartOpen(false)}
+              className="absolute top-2 right-2 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 boty-transition z-10"
+              aria-label="Close head size chart"
+            >
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <img
+              src="https://res.cloudinary.com/deafv5ovi/image/upload/v1787176685/WhatsApp_Image_2026-08-17_at_1.36.04_PM_nwcmdq.jpg"
+              alt="Ammie Hair head size chart enlarged"
+              className="w-full h-auto object-contain rounded-xl"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Comments Modal */}
       <Dialog open={showCommentsModal} onOpenChange={setShowCommentsModal}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
