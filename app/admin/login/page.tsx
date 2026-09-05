@@ -51,11 +51,6 @@ export default function AdminLoginPage() {
     <AuthCard
       title="Admin Login"
       subtitle="Sign in with your email and password to manage products"
-      footer={
-        <p className="text-muted-foreground transition-colors">
-          Store owner access only — no public sign-ups
-        </p>
-      }
     >
       {resetBanner && (
         <div className="bg-primary/10 text-primary text-sm rounded-full px-4 py-3 text-center mb-5">
