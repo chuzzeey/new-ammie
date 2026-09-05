@@ -1,0 +1,377 @@
+"use client"
+
+import { useState, useEffect, use, useRef, type FormEvent } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Star, Heart, MessageCircle, ChevronLeft, ChevronRight, Play, Send, ArrowLeft, X } from "lucide-react"
+import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
+import { reviews } from "@/components/sections/reviews-data"
+import type { ReviewComment } from "@/components/sections/reviews-data"
+
+export default function ReviewDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params)
+  const review = reviews.find((r) => r.id === resolvedParams.id)
+
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null)
+  const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(review?.likes || 0)
+  const [commentText, setCommentText] = useState("")
+  const [comments, setComments] = useState<ReviewComment[]>(review?.comments || [])
+  const mediaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [])
+
+  const openMedia = (index: number) => {
+    setSelectedMediaIndex(index)
+    setCurrentMediaIndex(index)
+  }
+
+  const closeMedia = () => {
+    setSelectedMediaIndex(null)
+  }
+
+  const showNextMedia = () => {
+    if (selectedMediaIndex === null || !review) return
+    setSelectedMediaIndex((selectedMediaIndex + 1) % review.media.length)
+  }
+
+  const showPrevMedia = () => {
+    if (selectedMediaIndex === null || !review) return
+    setSelectedMediaIndex((selectedMediaIndex - 1 + review.media.length) % review.media.length)
+  }
+
+  const handleLike = () => {
+    setLiked((current) => {
+      const next = !current
+      setLikeCount((count) => (next ? count + 1 : count - 1))
+      return next
+    })
+  }
+
+  const handleScroll = () => {
+    if (!mediaRef.current) return
+
+    const firstChild = mediaRef.current.firstElementChild as HTMLElement | null
+    const itemWidth = firstChild?.offsetWidth ?? 112
+    const gap = 12
+    const index = Math.round(mediaRef.current.scrollLeft / Math.max(itemWidth + gap, 1))
+    setCurrentMediaIndex(index)
+  }
+
+  const scrollToThumbnail = (index: number) => {
+    setCurrentMediaIndex(index)
+    mediaRef.current?.children[index]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" })
+  }
+
+  const handleAddComment = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!commentText.trim()) return
+
+    const newComment: ReviewComment = {
+      id: `c${Date.now()}`,
+      authorName: "You",
+      authorAvatar: "/placeholder-user.jpg",
+      text: commentText,
+      date: new Date().toISOString().split("T")[0],
+      likes: 0,
+    }
+
+    setComments([newComment, ...comments])
+    setCommentText("")
+  }
+
+  if (!review) {
+    return (
+      <main className="min-h-screen">
+        <Header />
+        <div className="pt-32 pb-20 text-center">
+          <h1 className="text-4xl font-serif text-foreground mb-4">Review Not Found</h1>
+          <p className="text-muted-foreground mb-8">The review you're looking for doesn't exist.</p>
+          <Link href="/" className="text-primary hover:underline">
+            Go back home
+          </Link>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
+
+  return (
+    <main className="min-h-screen">
+      <Header />
+
+      <div className="pt-20 pb-16 sm:pt-24 sm:pb-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <Link
+            href="/"
+            className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Home</span>
+          </Link>
+
+          <div className="overflow-hidden rounded-[1.5rem] border border-border/50 bg-white shadow-xl">
+            {review.media.length > 0 && (
+              <div className="relative bg-muted/30 p-3 sm:p-4">
+                <div className="mb-3 flex items-center justify-between px-1">
+                  <p className="text-sm font-medium text-foreground">Customer photos</p>
+                  <span className="text-xs text-muted-foreground">Tap to expand</span>
+                </div>
+
+                <div
+                  ref={mediaRef}
+                  onScroll={handleScroll}
+                  className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory hide-scrollbar"
+                >
+                  {review.media.map((media, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => openMedia(index)}
+                      className="group relative flex-shrink-0 snap-center overflow-hidden rounded-2xl border border-border/60 bg-muted shadow-sm"
+                    >
+                      <div className="relative h-24 w-24 overflow-hidden sm:h-28 sm:w-28 md:h-32 md:w-32">
+                        {media.type === "image" ? (
+                          <Image
+                            src={media.url}
+                            alt={`Review media ${index + 1}`}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            sizes="(max-width: 640px) 96px, 112px"
+                            priority={index === 0}
+                          />
+                        ) : (
+                          <>
+                            <Image
+                              src={media.thumbnail || media.url}
+                              alt={`Video thumbnail ${index + 1}`}
+                              fill
+                              className="object-cover transition-transform duration-300 group-hover:scale-105"
+                              sizes="(max-width: 640px) 96px, 112px"
+                              priority={index === 0}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 sm:h-12 sm:w-12">
+                                <Play className="ml-1 h-5 w-5 text-primary sm:h-6 sm:w-6" fill="currentColor" />
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {review.media.length > 1 && (
+                  <div className="mt-3 flex justify-center gap-2">
+                    {review.media.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => scrollToThumbnail(index)}
+                        className={`h-2 rounded-full transition-all duration-200 ${
+                          index === currentMediaIndex ? "w-8 bg-primary" : "w-2 bg-muted-foreground/40"
+                        }`}
+                        aria-label={`Go to media ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="p-4 sm:p-6 lg:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
+                <Image
+                  src={review.customerAvatar}
+                  alt={review.customerName}
+                  width={64}
+                  height={64}
+                  className="h-16 w-16 rounded-full object-cover"
+                />
+                <div className="flex-grow">
+                  <div className="mb-1 flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <h1 className="text-xl font-bold text-foreground">{review.customerName}</h1>
+                    <div className="flex items-center gap-0.5">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{review.location}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{review.date}</p>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-base leading-relaxed text-foreground whitespace-pre-wrap">{review.comment}</p>
+              </div>
+
+              <Link
+                href={`/product/${review.id}`}
+                className="mb-6 flex items-center gap-3 rounded-2xl bg-muted/50 p-4 transition-colors hover:bg-muted/80"
+              >
+                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-muted">
+                  <Image
+                    src={review.productImage}
+                    alt={review.productName}
+                    fill
+                    className="object-cover"
+                    sizes="64px"
+                  />
+                </div>
+                <div>
+                  <p className="mb-1 text-xs text-muted-foreground">Purchased Product</p>
+                  <p className="text-sm font-semibold text-foreground">{review.productName}</p>
+                </div>
+              </Link>
+
+              <div className="flex flex-wrap items-center gap-4 border-b border-border/50 pb-6 sm:gap-6">
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 transition-colors duration-200 ${
+                    liked ? "text-red-500" : "text-muted-foreground hover:text-red-500"
+                  }`}
+                >
+                  <Heart className={`h-5 w-5 ${liked ? "fill-current" : ""}`} />
+                  <span className="text-sm font-medium">{likeCount} likes</span>
+                </button>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="text-sm font-medium">{comments.length} comments</span>
+                </div>
+              </div>
+
+              <div className="pt-6">
+                <h3 className="mb-4 text-lg font-semibold text-foreground">Comments ({comments.length})</h3>
+
+                <form onSubmit={handleAddComment} className="mb-6">
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Image
+                      src="/placeholder-user.jpg"
+                      alt="Your avatar"
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 rounded-full object-cover sm:flex-shrink-0"
+                    />
+                    <div className="flex-grow">
+                      <textarea
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Write a comment..."
+                        className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        rows={2}
+                      />
+                      <div className="mt-2 flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={!commentText.trim()}
+                          className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <Send className="h-4 w-4" />
+                          Post Comment
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+
+                <div className="space-y-4">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="flex gap-3 border-b border-border/30 pb-4 last:border-0">
+                      <Image
+                        src={comment.authorAvatar}
+                        alt={comment.authorName}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                      <div className="flex-grow">
+                        <div className="mb-1 flex items-center gap-2">
+                          <h4 className="text-sm font-semibold text-foreground">{comment.authorName}</h4>
+                          <span className="text-xs text-muted-foreground">{comment.date}</span>
+                        </div>
+                        <p className="mb-2 text-sm leading-relaxed text-foreground/80">{comment.text}</p>
+                        <button className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-red-500">
+                          <Heart className="h-3.5 w-3.5" />
+                          <span>{comment.likes}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {selectedMediaIndex !== null && review.media[selectedMediaIndex] && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 px-3 py-4 sm:px-6">
+          <button
+            type="button"
+            onClick={closeMedia}
+            className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 text-foreground shadow-lg transition hover:bg-white"
+            aria-label="Close gallery"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="relative flex h-full w-full max-w-6xl items-center justify-center">
+            <button
+              type="button"
+              onClick={showPrevMedia}
+              className="absolute left-1 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg transition hover:bg-white sm:left-3 sm:h-12 sm:w-12"
+              aria-label="Previous media"
+            >
+              <ChevronLeft className="h-5 w-5 text-foreground sm:h-6 sm:w-6" />
+            </button>
+
+            <div className="relative h-[70vh] w-full overflow-hidden rounded-[1.5rem] bg-black/90">
+              {review.media[selectedMediaIndex].type === "image" ? (
+                <Image
+                  src={review.media[selectedMediaIndex].url}
+                  alt={`Review media ${selectedMediaIndex + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-black">
+                  <Image
+                    src={review.media[selectedMediaIndex].thumbnail || review.media[selectedMediaIndex].url}
+                    alt={`Video thumbnail ${selectedMediaIndex + 1}`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/90 shadow-lg sm:h-24 sm:w-24">
+                      <Play className="ml-1 h-10 w-10 text-primary sm:h-12 sm:w-12" fill="currentColor" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={showNextMedia}
+              className="absolute right-1 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg transition hover:bg-white sm:right-3 sm:h-12 sm:w-12"
+              aria-label="Next media"
+            >
+              <ChevronRight className="h-5 w-5 text-foreground sm:h-6 sm:w-6" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </main>
+  )
+}

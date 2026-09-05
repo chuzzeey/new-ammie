@@ -1,0 +1,80 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { Award, Scissors, Sparkles, Heart } from "lucide-react"
+
+const badges = [
+  {
+    icon: Award,
+    title: "Premium Quality",
+    description: "100% virgin human hair"
+  },
+  {
+    icon: Scissors,
+    title: "Expert Crafted",
+    description: "Hand-tied bleached knots"
+  },
+  {
+    icon: Sparkles,
+    title: "Tangle-Free",
+    description: "Natural cuticle alignment"
+  },
+  {
+    icon: Heart,
+    title: "Ethically Sourced",
+    description: "Fair trade certified"
+  }
+]
+
+export function TrustBadges() {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current)
+      }
+    }
+  }, [])
+
+  return (
+    <section className="py-20 bg-background">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div 
+          ref={sectionRef}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
+        >
+          {badges.map((badge, index) => (
+            <div
+              key={badge.title}
+              className={`bg-background p-3 md:p-6 lg:p-8 text-center rounded-xl border border-stone-200 transition-all duration-700 ease-out border-none ${
+                isVisible 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transitionDelay: `${index * 150}ms` }}
+            >
+              <badge.icon className="text-primary mb-2 md:mb-4 mx-auto size-8 md:size-12" strokeWidth={1} />
+              <h3 className="font-serif text-foreground mb-1 md:mb-2 text-sm md:text-2xl">{badge.title}</h3>
+              <p className="text-[10px] md:text-sm text-muted-foreground">{badge.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

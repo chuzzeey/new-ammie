@@ -1,0 +1,91 @@
+/**
+ * Branded "Reset your password" email template for Ammie N.
+ *
+ * Email-client-safe by design:
+ *   - table layout + inline styles only (no external CSS)
+ *   - system font stacks (custom web fonts are unreliable in email clients)
+ *   - {{ .ConfirmationURL }} is the Supabase (GoTrue) template variable for the
+ *     action link — it honours the redirectTo the app sends, landing on
+ *     /api/auth/confirm?next=/admin/update-password
+ */
+
+export const RECOVERY_SUBJECT = "Reset your password — Ammie N"
+
+export const LOGO_URL =
+  "https://res.cloudinary.com/deafv5ovi/image/upload/v1784555201/a_dow3yp.png"
+
+export function recoveryTemplateHtml(expiresLabel) {
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>Reset your password — Ammie N</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#F7F4EF;">
+    <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+      Reset your Ammie N password — this link is valid for ${expiresLabel}.
+    </div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#F7F4EF" style="background-color:#F7F4EF; padding:40px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px; background-color:#FFFFFF; border-radius:16px; border:1px solid #D8CFC4;">
+            <tr>
+              <td align="center" style="padding:40px 40px 8px 40px;">
+                <img src="${LOGO_URL}" width="56" height="56" alt="Ammie N" style="display:block; width:56px; height:56px; border-radius:50%; border:0;" />
+                <div style="margin-top:14px; font-family:Georgia, 'Times New Roman', serif; font-size:22px; letter-spacing:0.04em; color:#2C2C2C;">Ammie&nbsp;N</div>
+                <div style="margin-top:4px; font-family:-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#6B6560;">Premium Hair &amp; Extensions</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 40px 8px 40px; font-family:-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#2C2C2C;">
+                <h1 style="margin:0 0 16px 0; font-family:Georgia, 'Times New Roman', serif; font-size:26px; font-weight:600; color:#2C2C2C;">Reset your password</h1>
+                <p style="margin:0 0 14px 0; font-size:15px; line-height:1.6; color:#2C2C2C;">
+                  We received a request to reset the password for your account.
+                  Click the button below to choose a new password.
+                </p>
+                <p style="margin:0 0 24px 0; font-size:13px; line-height:1.6; color:#6B6560;">
+                  This link is valid for <strong style="color:#2C2C2C;">${expiresLabel}</strong>.
+                </p>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding:0 0 24px 0;">
+                      <a href="{{ .ConfirmationURL }}" style="display:inline-block; background-color:#4F5B3A; color:#F7F4EF; font-family:-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:15px; letter-spacing:0.05em; text-decoration:none; padding:14px 36px; border-radius:9999px;">
+                        Reset Your Password
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:0 0 28px 0; font-size:13px; line-height:1.6; color:#6B6560;">
+                  If you didn&apos;t request a password reset, you can safely ignore
+                  this email &mdash; your password won&apos;t change.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0 40px 32px 40px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#F7F4EF" style="background-color:#F7F4EF; border-radius:12px;">
+                  <tr>
+                    <td style="padding:16px 20px; font-family:-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:12px; line-height:1.6; color:#6B6560;">
+                      Button not working? Copy and paste this link into your browser:<br />
+                      <a href="{{ .ConfirmationURL }}" style="color:#4F5B3A; word-break:break-all;">{{ .ConfirmationURL }}</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:20px 40px 32px 40px; border-top:1px solid #D8CFC4; font-family:-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                <div style="font-size:12px; color:#6B6560;">&copy; Ammie N &mdash; Premium Hair &amp; Extensions</div>
+                <div style="margin-top:4px; font-size:11px; color:#B8ADA3;">This is an automated message. Please do not reply.</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+`
+}
