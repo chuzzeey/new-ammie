@@ -271,6 +271,7 @@
 }
 
 .brand-loader-slogan {
+  opacity: 0;
   margin-top: 0.9rem;
   color: #80674f;
   font-family: Arial, Helvetica, sans-serif;
@@ -279,15 +280,8 @@
   letter-spacing: 0.16em;
   text-align: center;
   text-transform: uppercase;
-  white-space: pre;
-}
-
-.brand-loader-slogan-letter {
-  display: inline-block;
-  opacity: 0;
-  transform: scaleX(0.3);
-  transform-origin: left center;
-  animation: brand-loader-slogan-write 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  white-space: nowrap;
+  animation: brand-loader-slogan-reveal 320ms ease-out 2100ms forwards;
 }
 
 .brand-loader-name::after {
@@ -301,13 +295,13 @@
   content: "";
   transform: scaleX(0);
   transform-origin: center;
-  animation: brand-loader-underline 500ms ease-out 1.25s forwards;
+  animation: brand-loader-underline 500ms ease-out 1.85s forwards;
 }
 
 .brand-loader-letter {
   display: inline-block;
   opacity: 0;
-  animation: brand-loader-zoom 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: brand-loader-zoom 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes brand-loader-zoom {
@@ -334,14 +328,12 @@
   }
 }
 
-@keyframes brand-loader-slogan-write {
+@keyframes brand-loader-slogan-reveal {
   0% {
     opacity: 0;
-    transform: scaleX(0.3) translateY(3px);
   }
   100% {
     opacity: 1;
-    transform: scaleX(1) translateY(0);
   }
 }
 
@@ -356,10 +348,9 @@
     transform: scaleX(1);
   }
 
-  .brand-loader-slogan-letter {
+  .brand-loader-slogan {
     opacity: 1;
     animation: none;
-    transform: none;
   }
 
   .brand-loader {

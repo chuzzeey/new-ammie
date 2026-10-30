@@ -34,23 +34,13 @@ export function BrandLoader() {
             <span
               key={`${character}-${index}`}
               className="brand-loader-letter"
-              style={{ animationDelay: `${index * 100}ms` }}
+              style={{ animationDelay: `${index * 160}ms` }}
             >
               {character}
             </span>
           ))}
         </span>
-        <span className="brand-loader-slogan" aria-label={slogan}>
-          {Array.from(slogan, (character, index) => (
-            <span
-              key={`${character}-${index}`}
-              className="brand-loader-slogan-letter"
-              style={{ animationDelay: `${1650 + index * 25}ms` }}
-            >
-              {character}
-            </span>
-          ))}
-        </span>
+        <span className="brand-loader-slogan">{slogan}</span>
       </div>
     </div>
   )
