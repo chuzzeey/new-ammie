@@ -2,16 +2,10 @@
 
 import { useEffect, useRef, useState } from "react"
 
-const featureImages = [
-  "https://res.cloudinary.com/deafv5ovi/image/upload/v1785729916/WhatsApp_Image_2026-08-02_at_9.18.28_PM_xa9aol.jpg",
-  "https://res.cloudinary.com/deafv5ovi/image/upload/v1785729915/WhatsApp_Image_2026-08-02_at_9.18.29_PM_nehk7c.jpg",
-]
-
 export function FeatureSection() {
   const [isVisible, setIsVisible] = useState(false)
   const [isVideoVisible, setIsVideoVisible] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(false)
-  const [activeImageIndex, setActiveImageIndex] = useState(0)
   const bentoRef = useRef<HTMLDivElement>(null)
   const videoSectionRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
@@ -69,43 +63,13 @@ export function FeatureSection() {
     }
   }, [])
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveImageIndex((current) => (current + 1) % featureImages.length)
-    }, 3200)
-
-    return () => clearInterval(timer)
-  }, [])
-
   return (
     <section className="bg-muted py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div 
           ref={videoSectionRef}
-          className="grid items-center gap-8 sm:gap-12 lg:grid-cols-2 lg:gap-20"
+          className="mx-auto max-w-3xl"
         >
-          {/* Image carousel */}
-          <div 
-            className={`relative aspect-[4/5] overflow-hidden rounded-md transition-all duration-700 ease-out ${
-              isVideoVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-          >
-            {featureImages.map((image, index) => (
-              <img
-                key={image}
-                src={image}
-                alt="Why Ammie Hair"
-                className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-in-out ${
-                  index === activeImageIndex ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-6'
-                }`}
-                style={{
-                  objectPosition: 'center center',
-                  filter: 'saturate(0.9) contrast(1.02)',
-                }}
-              />
-            ))}
-          </div>
-
           {/* Content */}
           <div
             ref={headerRef}

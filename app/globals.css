@@ -298,30 +298,6 @@
   animation: brand-loader-underline 500ms ease-out 1.85s forwards;
 }
 
-.brand-loader-letter {
-  display: inline-block;
-  opacity: 0;
-  animation: brand-loader-zoom 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes brand-loader-zoom {
-  0% {
-    opacity: 0;
-    filter: blur(8px);
-    transform: scale(0.35) rotate(-8deg);
-  }
-  65% {
-    opacity: 1;
-    filter: blur(0);
-    transform: scale(1.22) rotate(2deg);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: scale(1) rotate(0);
-  }
-}
-
 @keyframes brand-loader-underline {
   to {
     transform: scaleX(1);
@@ -338,11 +314,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand-loader-letter {
-    opacity: 1;
-    animation: none;
-  }
-
   .brand-loader-name::after {
     animation: none;
     transform: scaleX(1);

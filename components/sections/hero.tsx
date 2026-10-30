@@ -1,56 +1,21 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
-const heroImages = [
-  "https://res.cloudinary.com/deafv5ovi/image/upload/v1785729916/WhatsApp_Image_2026-08-02_at_9.18.28_PM_xa9aol.jpg",
-  "https://res.cloudinary.com/deafv5ovi/image/upload/v1785729915/WhatsApp_Image_2026-08-02_at_9.18.29_PM_nehk7c.jpg",
-]
+const heroImage = "https://res.cloudinary.com/dqyan6prx/image/upload/v1793326722/WhatsApp_Image_2026-10-29_at_21.58.23.jpg"
 
 export function Hero() {
-  const [desktopOrder, setDesktopOrder] = useState([0, 1])
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setDesktopOrder((current) => [current[1], current[0]])
-    }, 2600)
-
-    return () => clearInterval(timer)
-  }, [])
-
   return (
     <section className="relative flex min-h-[min(860px,92svh)] items-center overflow-hidden bg-[#121212]">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="hidden xl:flex h-full w-full gap-2">
-          {desktopOrder.map((index) => (
-            <div key={`${heroImages[index]}-${index}`} className="h-full flex-1 overflow-hidden transition-all duration-700 ease-in-out">
-              <img
-                src={heroImages[index]}
-                alt="Ammie N premium hair collection"
-                className="h-full w-full object-cover"
-                style={{
-                  objectPosition: "center center",
-                  filter: "saturate(0.9) contrast(1.02)",
-                }}
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="xl:hidden absolute inset-0">
-          <img
-            src={heroImages[0]}
-            alt="Ammie N premium hair collection"
-            className="h-full w-full object-cover"
-            style={{
-              objectPosition: "center center",
-              filter: "saturate(0.9) contrast(1.02)",
-            }}
-          />
-        </div>
-
+        <img
+          src={heroImage}
+          alt="Ammie N premium hair collection"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{
+            objectPosition: "25% center",
+            filter: "saturate(0.9) contrast(1.02)",
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-black/5" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
       </div>

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { Product, ProductInput } from '@/lib/supabase'
+import { deleteProductImagesFromSupabase } from '@/lib/supabase/product-image-upload'
 import { processProductMedia } from '@/lib/utils/media-processing'
 
 export interface ProductListOptions {
@@ -131,9 +132,21 @@ export async function updateProduct(
   productId: string,
   productData: Partial<ProductInput>
 ): Promise<{ data: Product | null; error: Error | null }> {
+  let updatedProduct: Product | null = null
+
   try {
+    const { data: existingProduct, error: fetchError } = await supabase
+      .from('products')
+      .select('images')
+      .eq('id', productId)
+      .single()
+
+    if (fetchError) {
+      return { data: null, error: new Error(fetchError.message) }
+    }
+
     // Process media if provided
-    const updatePayload: any = { ...productData }
+    const updatePayload: Partial<ProductInput> = { ...productData }
     
     if (productData.images) {
       const processedMedia = processProductMedia(productData.images)
@@ -151,11 +164,18 @@ export async function updateProduct(
       return { data: null, error: new Error(error.message) }
     }
 
-    return { data, error: null }
+    updatedProduct = data
+
+    if (productData.images && data) {
+      const removedImages = existingProduct.images.filter((imageUrl: string) => !data.images.includes(imageUrl))
+      await deleteProductImagesFromSupabase(removedImages)
+    }
+
+    return { data: updatedProduct, error: null }
   } catch (error) {
     return { 
-      data: null, 
-      error: error instanceof Error ? error : new Error('Failed to update product') 
+      data: updatedProduct,
+      error: error instanceof Error ? error : new Error('Failed to update product')
     }
   }
 }
@@ -169,22 +189,47 @@ export async function updateProduct(
  * @example
  * const { success, error } = await deleteProduct('uuid-here')
  */
-export async function deleteProduct(productId: string): Promise<{ success: boolean; error: Error | null }> {
+export async function deleteProduct(productId: string): Promise<{
+  success: boolean
+  error: Error | null
+  cleanupError: Error | null
+}> {
   try {
+    const { data: product, error: fetchError } = await supabase
+      .from('products')
+      .select('images')
+      .eq('id', productId)
+      .single()
+
+    if (fetchError) {
+      return { success: false, error: new Error(fetchError.message), cleanupError: null }
+    }
+
     const { error } = await supabase
       .from('products')
       .delete()
       .eq('id', productId)
 
     if (error) {
-      return { success: false, error: new Error(error.message) }
+      return { success: false, error: new Error(error.message), cleanupError: null }
     }
 
-    return { success: true, error: null }
+    try {
+      await deleteProductImagesFromSupabase(product.images)
+    } catch (cleanupError) {
+      return {
+        success: true,
+        error: null,
+        cleanupError: cleanupError instanceof Error ? cleanupError : new Error('Failed to delete product images'),
+      }
+    }
+
+    return { success: true, error: null, cleanupError: null }
   } catch (error) {
     return { 
       success: false, 
-      error: error instanceof Error ? error : new Error('Failed to delete product') 
+      error: error instanceof Error ? error : new Error('Failed to delete product'),
+      cleanupError: null,
     }
   }
 }
@@ -258,22 +303,46 @@ export async function createProducts(products: ProductInput[]): Promise<{ data: 
  * @param productIds - Array of product UUIDs to delete
  * @returns Success status or error
  */
-export async function deleteProducts(productIds: string[]): Promise<{ success: boolean; error: Error | null }> {
+export async function deleteProducts(productIds: string[]): Promise<{
+  success: boolean
+  error: Error | null
+  cleanupError: Error | null
+}> {
   try {
+    const { data: products, error: fetchError } = await supabase
+      .from('products')
+      .select('images')
+      .in('id', productIds)
+
+    if (fetchError) {
+      return { success: false, error: new Error(fetchError.message), cleanupError: null }
+    }
+
     const { error } = await supabase
       .from('products')
       .delete()
       .in('id', productIds)
 
     if (error) {
-      return { success: false, error: new Error(error.message) }
+      return { success: false, error: new Error(error.message), cleanupError: null }
     }
 
-    return { success: true, error: null }
+    try {
+      await deleteProductImagesFromSupabase(products.flatMap((product) => product.images))
+    } catch (cleanupError) {
+      return {
+        success: true,
+        error: null,
+        cleanupError: cleanupError instanceof Error ? cleanupError : new Error('Failed to delete product images'),
+      }
+    }
+
+    return { success: true, error: null, cleanupError: null }
   } catch (error) {
     return { 
       success: false, 
-      error: error instanceof Error ? error : new Error('Failed to delete products') 
+      error: error instanceof Error ? error : new Error('Failed to delete products'),
+      cleanupError: null,
     }
   }
 }

@@ -120,15 +120,25 @@ function AdminProductCard({
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                <button
-                  type="button"
-                  onClick={() => onEdit(product)}
-                  className="inline-flex min-h-9 flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[9px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:gap-1.5 sm:px-3 md:px-4 md:text-xs"
-                >
-                  <Edit3 className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5" />
-                  <span className="hidden sm:inline">Edit</span>
-                </button>
+              <div className="flex flex-col gap-1.5 sm:gap-2">
+                <div className="flex gap-1.5 sm:gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onEdit(product)}
+                    className="inline-flex min-h-9 flex-[2] items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[9px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:gap-1.5 sm:px-3 md:px-4 md:text-xs"
+                  >
+                    <Edit3 className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(product.id)}
+                    className="inline-flex min-h-9 flex-1 items-center justify-center gap-1 rounded-sm border border-destructive/20 px-2 py-1.5 text-[9px] font-medium text-destructive transition-colors hover:bg-destructive/10 sm:gap-1.5 sm:px-3 md:px-4 md:text-xs"
+                  >
+                    <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
@@ -137,17 +147,10 @@ function AdminProductCard({
                   }}
                   aria-expanded={discountEditorOpen}
                   aria-label={product.discount_percentage ? `Edit ${product.discount_percentage}% discount` : "Add discount"}
-                  className="inline-flex min-h-9 items-center justify-center gap-1 rounded-sm border border-border px-2 py-1.5 text-[9px] font-medium text-foreground transition-colors hover:bg-muted sm:px-3 md:text-xs"
+                  className="inline-flex min-h-9 w-full items-center justify-center gap-1 rounded-sm border border-border px-2 py-1.5 text-[9px] font-medium text-foreground transition-colors hover:bg-muted sm:px-3 md:text-xs"
                 >
                   <Percent className="h-3 w-3" />
                   <span>Discount</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDelete(product.id)}
-                  className="inline-flex min-h-9 items-center justify-center gap-1 rounded-sm border border-destructive/20 px-2 py-1.5 text-[9px] font-medium text-destructive transition-colors hover:bg-destructive/10 sm:gap-1.5 sm:px-3 md:px-4 md:text-xs"
-                >
-                  <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5" />
                 </button>
               </div>
               {discountEditorOpen && (

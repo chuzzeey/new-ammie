@@ -241,13 +241,20 @@ export default function AdminPage() {
         
         const { data, error } = await updateProduct(editingId, validationResult.data)
 
-        if (error) {
+        if (error && !data) {
           log.error('Update failed', { error, productId: editingId })
           throw error
         }
 
+        if (error) {
+          log.error('Product saved, but image cleanup failed', { error, productId: editingId })
+          toast.warning('Product saved, but one or more old images could not be deleted from Supabase Storage.')
+        }
+
         log.info('Product updated successfully', { productId: editingId, data })
-        toast.success(`Product "${validationResult.data.name}" updated successfully!`)
+        if (!error) {
+          toast.success(`Product "${validationResult.data.name}" updated successfully!`)
+        }
 
         // Trigger ISR revalidation
         revalidateProductPage(editingId)
@@ -361,15 +368,24 @@ export default function AdminPage() {
     if (!productToDelete) return
 
     try {
-      const { error } = await deleteProduct(productToDelete.id)
+      const { success, error, cleanupError } = await deleteProduct(productToDelete.id)
 
       if (error) {
         log.error('Delete failed', { error, productId: productToDelete.id })
         throw error
       }
 
+      if (!success) {
+        throw new Error('Product deletion did not complete.')
+      }
+
       log.info('Product deleted successfully', { productId: productToDelete.id })
-      toast.success(`Product "${productToDelete.name}" deleted permanently!`)
+      if (cleanupError) {
+        log.error('Product deleted, but image cleanup failed', { cleanupError, productId: productToDelete.id })
+        toast.warning(`Product "${productToDelete.name}" was deleted, but one or more images could not be removed from Supabase Storage.`)
+      } else {
+        toast.success(`Product "${productToDelete.name}" deleted permanently!`)
+      }
       setProductToDelete(null)
     } catch (error) {
       log.error('Error deleting product', { error, productId: productToDelete?.id })
