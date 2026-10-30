@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Plus, X, Search, Loader2 } from "lucide-react"
+import { Plus, X, Search, Loader2, Users, Mail, Package } from "lucide-react"
 import { toast } from "sonner"
 import { Header } from "@/components/layout/header"
 import { ConfirmationModal } from "@/components/shared/confirmation-modal"
@@ -15,7 +15,6 @@ import BasicInfoForm from "@/features/admin/components/basic-info-form"
 import PricingForm from "@/features/admin/components/pricing-form"
 import RatingForm from "@/features/admin/components/rating-form"
 import ProductGrid from "@/features/admin/components/product-grid"
-import { getProductDescription } from "@/lib/services/product-descriptions"
 import { validateProduct, type ValidationResult } from "@/lib/utils/product-validation"
 import { getProducts, createProduct, updateProduct, deleteProduct } from "@/lib/services/products"
 
@@ -36,11 +35,15 @@ const log = {
 
 export default function AdminPage() {
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState<"products" | "customers" | "emails">("products")
   const [mounted, setMounted] = useState(false)
   const [authChecking, setAuthChecking] = useState(true)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showStorePreview, setShowStorePreview] = useState(false)
+  const [showPreviewWarning, setShowPreviewWarning] = useState(false)
+  const [previewKey, setPreviewKey] = useState(0)
   const [form, setForm] = useState<ProductForm>({ ...emptyForm })
   const [editingId, setEditingId] = useState<string | null>(null)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
@@ -49,8 +52,6 @@ export default function AdminPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [productToDelete, setProductToDelete] = useState<{ id: string; name: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const descriptionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
   // ── Auth guard: redirect to login if no session ──
   useEffect(() => {
     let mounted = true
@@ -165,27 +166,6 @@ export default function AdminPage() {
     }
 
     setForm((prev) => ({ ...prev, [field]: processedValue }))
-
-    // Debounce auto-description generation: wait 4 seconds after the user
-    // stops typing the product name before generating the description.
-    if (field === "name") {
-      if (descriptionTimerRef.current) {
-        clearTimeout(descriptionTimerRef.current)
-      }
-      descriptionTimerRef.current = setTimeout(() => {
-        setForm((prev) => {
-          if (!prev.name.trim()) return prev
-          return { ...prev, description: getProductDescription(prev.name) }
-        })
-      }, 4000)
-    }
-  }
-
-  const handleRegenerateDescription = () => {
-    setForm((prev) => ({
-      ...prev,
-      description: getProductDescription(prev.name)
-    }))
   }
 
   const handleSizesChange = (newSizes: string[]) => {
@@ -224,7 +204,6 @@ export default function AdminPage() {
           category: form.category,
           images: form.images,
           rating: form.rating,
-          reviewCount: form.reviewCount,
           sizes: form.sizes
         }
       })
@@ -236,7 +215,6 @@ export default function AdminPage() {
         category: form.category,
         images: form.images,
         rating: form.rating,
-        reviewCount: form.reviewCount,
         sizes: form.sizes,
         badge: form.badge,
         description: form.description
@@ -300,7 +278,7 @@ export default function AdminPage() {
           category: form.category,
           images: form.images,
           rating: form.rating,
-          reviewCount: form.reviewCount
+          sizes: form.sizes
         }
       })
 
@@ -346,7 +324,6 @@ export default function AdminPage() {
       images: [...product.images, "", "", "", "", ""].slice(0, 5),
       sizes: product.sizes,
       rating: String(product.rating),
-      reviewCount: String(product.review_count),
       description: product.description || "",
       category: product.category
     })
@@ -408,6 +385,25 @@ export default function AdminPage() {
     }
   }
 
+  const setProductDiscount = async (id: string, discountPercentage: number) => {
+    const { data, error } = await updateProduct(id, { discount_percentage: discountPercentage })
+    if (error) {
+      log.error("Failed to update product discount", { error, productId: id, discountPercentage })
+      toast.error("Unable to update product discount")
+      return false
+    }
+
+    if (data) {
+      setProducts((current) => current.map((product) => product.id === id ? data : product))
+      revalidateProductPage(id)
+    } else {
+      toast.error("Product discount update returned no product.")
+      return false
+    }
+    toast.success(discountPercentage ? `${discountPercentage}% discount applied` : "Discount removed")
+    return true
+  }
+
   const filteredProducts = searchQuery.trim()
     ? products.filter(
         (p) =>
@@ -429,7 +425,32 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden">
-      <Header variant="admin" onLogoutClick={handleLogout} />
+      <Header
+        variant="admin"
+        onLogoutClick={handleLogout}
+        onPreviewClick={() => {
+          if (showStorePreview) {
+            setShowStorePreview(false)
+          } else {
+            setShowPreviewWarning(true)
+          }
+        }}
+        isPreviewOpen={showStorePreview}
+      />
+
+      <ConfirmationModal
+        isOpen={showPreviewWarning}
+        onClose={() => setShowPreviewWarning(false)}
+        onConfirm={() => {
+          setPreviewKey((key) => key + 1)
+          setShowStorePreview(true)
+        }}
+        title="Preview your live store?"
+        message="This loads the current storefront homepage inside the admin page. You will stay on /admin, and the preview reflects the latest published site content."
+        confirmText="Continue to Preview"
+        cancelText="Go Back"
+        variant="info"
+      />
 
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
@@ -445,28 +466,63 @@ export default function AdminPage() {
         cancelText="No, Cancel"
         variant="danger"
       />
+
+      {showStorePreview && (
+        <section className="px-4 pt-24 sm:px-6 lg:px-8" aria-label="Store preview">
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-md border border-border bg-background">
+            <div className="flex min-h-12 items-center justify-between border-b border-border px-4">
+              <h2 className="text-sm font-medium text-foreground">Store Preview</h2>
+              <button
+                type="button"
+                onClick={() => setShowStorePreview(false)}
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Close
+              </button>
+            </div>
+            <iframe
+              key={previewKey}
+              src="/"
+              title="Storefront preview"
+              loading="eager"
+              className="block h-[75vh] min-h-[500px] w-full bg-background"
+            />
+          </div>
+        </section>
+      )}
       
       <div className="pt-35 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Header - Stack on mobile, row on desktop */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-10">
+          <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-foreground mb-1 sm:mb-2">Admin Dashboard</h1>
-              <p className="text-sm sm:text-base text-muted-foreground">Manage all products</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Store management</p>
+              <h1 className="mb-1 font-sans text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                {activeTab === "products" ? "Products" : activeTab === "customers" ? "Customers" : "Emails"}
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                {activeTab === "products"
+                  ? "Manage all products"
+                  : activeTab === "customers"
+                    ? "Customer records and registration"
+                    : "Customer email management"}
+              </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={openAddForm}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 sm:px-6 py-3 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                Add Product
-              </button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:w-auto">
+              {activeTab === "products" && (
+                <button
+                  type="button"
+                  onClick={openAddForm}
+                  className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-sm bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Product
+                </button>
+              )}
               <Link
                 href="/admin/reviews"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-5 sm:px-6 py-3 rounded-full text-sm tracking-wide boty-transition hover:bg-blue-700 cursor-pointer"
+                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-sm border border-border px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted sm:w-auto"
               >
                 <Plus className="w-4 h-4" />
                 Open Reviews Page
@@ -474,31 +530,65 @@ export default function AdminPage() {
             </div>
           </div>
 
+          <div className="mb-8">
+            <div
+              role="tablist"
+              aria-label="Admin sections"
+              className="grid grid-cols-3 border-b border-border"
+            >
+              {([
+                { id: "products", label: "Products", icon: Package },
+                { id: "customers", label: "Customers", icon: Users },
+                { id: "emails", label: "Emails", icon: Mail },
+              ] as const).map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  id={`admin-tab-${id}`}
+                  aria-selected={activeTab === id}
+                  aria-controls="admin-tab-panel"
+                  onClick={() => setActiveTab(id)}
+                  className={`inline-flex min-w-0 items-center justify-center gap-1.5 border-b-2 px-1 py-3 text-xs font-medium transition-colors sm:gap-2 sm:px-4 sm:text-sm ${
+                    activeTab === id
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeTab === "products" ? (
+            <div role="tabpanel" id="admin-tab-panel" aria-labelledby="admin-tab-products">
           {/* Search Input - Centered and Responsive */}
           <div className="mb-8 sm:mb-10">
-            <div className="relative max-w-2xl mx-auto">
+            <div className="relative max-w-2xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="w-full bg-background border border-border rounded-full pl-12 pr-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                className="min-h-11 w-full rounded-sm border border-border bg-background py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground sm:text-base"
               />
             </div>
           </div>
 
           {/* Add/Edit Form Overlay */}
           {showAddForm && (
-            <div className="mb-12 sm:mb-16 bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 boty-shadow border border-border/50">
+            <div className="mb-12 rounded-md border border-border bg-background p-4 sm:mb-16 sm:p-6 md:p-8">
               <div className="flex items-center justify-between mb-6 sm:mb-8">
-                <h2 className="font-serif text-xl sm:text-2xl md:text-3xl text-foreground">
+                <h2 className="font-sans text-lg font-semibold text-foreground sm:text-xl">
                   {editingId ? "Edit Product" : "Add New Product"}
                 </h2>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:text-foreground boty-transition cursor-pointer"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -517,11 +607,9 @@ export default function AdminPage() {
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6 sm:gap-6">
                   <BasicInfoForm
                     name={form.name}
-                    badge={form.badge}
                     description={form.description}
                     category={form.category}
                     onChange={updateField}
-                    onRegenerateDescription={handleRegenerateDescription}
                   />
 
                   <PricingForm
@@ -533,7 +621,6 @@ export default function AdminPage() {
 
                   <RatingForm
                     rating={form.rating}
-                    reviewCount={form.reviewCount}
                     onChange={updateField}
                   />
 
@@ -542,7 +629,7 @@ export default function AdminPage() {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-sm bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-1"
                     >
                       {submitting ? 'Saving...' : (editingId ? "Update Product" : "Add Product")}
                     </button>
@@ -550,7 +637,7 @@ export default function AdminPage() {
                       type="button"
                       onClick={resetForm}
                       disabled={submitting}
-                      className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-transparent border border-foreground/20 text-foreground px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-foreground/5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-sm border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 sm:flex-1"
                     >
                       Cancel
                     </button>
@@ -564,7 +651,7 @@ export default function AdminPage() {
           {/* Products Grid - Same layout as shop page */}
           <section className="mt-14 sm:mt-16">
             <div className="mb-6 sm:mb-8">
-              <h2 className="font-serif text-xl sm:text-2xl md:text-3xl text-foreground">
+              <h2 className="font-sans text-lg font-semibold text-foreground sm:text-xl">
                 {loading ? "Loading..." : `All Products (${filteredProducts.length})`}
               </h2>
             </div>
@@ -575,9 +662,37 @@ export default function AdminPage() {
                 products={filteredProducts}
                 onEdit={editProduct}
                 onDelete={deleteProductWrapper}
+                onSetDiscount={setProductDiscount}
               />
             )}
           </section>
+            </div>
+          ) : (
+            <section
+              role="tabpanel"
+              id="admin-tab-panel"
+              aria-labelledby={`admin-tab-${activeTab}`}
+              className="flex min-h-72 flex-col items-center justify-center rounded-md border border-dashed border-border bg-background px-6 py-12 text-center"
+            >
+              {activeTab === "customers" ? (
+                <>
+                  <Users className="mb-4 h-8 w-8 text-muted-foreground" />
+                  <h2 className="text-lg font-semibold text-foreground">Customer registration is not set up yet</h2>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                    Customer records and registration tools can be added here when your registration form is ready.
+                  </p>
+                </>
+              ) : activeTab === "emails" ? (
+                <>
+                  <Mail className="mb-4 h-8 w-8 text-muted-foreground" />
+                  <h2 className="text-lg font-semibold text-foreground">Email tools coming soon</h2>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                    Customer email management will be available here once customer registration is connected.
+                  </p>
+                </>
+              ) : null}
+            </section>
+          )}
         </div>
       </div>
 

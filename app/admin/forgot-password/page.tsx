@@ -62,7 +62,7 @@ export default function AdminForgotPasswordPage() {
     >
       {sent ? (
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-foreground">
             <MailCheck className="w-7 h-7" />
           </div>
           <p className="text-sm text-muted-foreground">
@@ -83,7 +83,7 @@ export default function AdminForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {error && (
-            <div className="bg-destructive/10 text-destructive text-sm rounded-full px-4 py-3 text-center">
+            <div className="rounded-sm border border-destructive/20 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
               {error}
             </div>
           )}
@@ -100,14 +100,14 @@ export default function AdminForgotPasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full bg-background border border-border rounded-full pl-4 pr-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+              className="min-h-12 w-full rounded-sm border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground sm:text-base"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-sm bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <>

@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { createPortal } from "react-dom"
 import { Minus, Plus, Trash2, ShoppingBag, X, Loader2, Search, ChevronDown } from "lucide-react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { Country, State } from "country-state-city"
 import {
   Drawer,
@@ -15,7 +15,18 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import { useCart } from "@/components/providers/cart-context"
-import { createClientBrowser } from "@/lib/supabase"
+
+type CheckoutCurrency = "NGN" | "GBP" | "USD"
+
+function formatCurrency(value: number, currency: CheckoutCurrency) {
+  const locale = currency === "NGN" ? "en-NG" : currency === "GBP" ? "en-GB" : "en-US"
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value || 0)
+}
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -31,11 +42,11 @@ function useIsMobile() {
 }
 
 export function CartDrawer() {
-  const { items, removeItem, updateQuantity, clearCart, isOpen, setIsOpen, itemCount, subtotal } = useCart()
+  const { items, removeItem, updateQuantity, isOpen, setIsOpen, itemCount, subtotal } = useCart()
   const isMobile = useIsMobile()
-  const router = useRouter()
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false)
+  const [showGatewayWarning, setShowGatewayWarning] = useState(false)
   const [customerName, setCustomerName] = useState("")
   const [customerPhone, setCustomerPhone] = useState("")
   const [selectedCountry, setSelectedCountry] = useState("NG")
@@ -43,6 +54,9 @@ export function CartDrawer() {
   const [customerAddress, setCustomerAddress] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
+  const [gbpRate, setGbpRate] = useState<number | null>(null)
+  const [gbpRateStatus, setGbpRateStatus] = useState<"idle" | "loading" | "ready" | "error">("idle")
+  const [gbpRateRetry, setGbpRateRetry] = useState(0)
 
   // Country dropdown state
   const [countrySearch, setCountrySearch] = useState("")
@@ -54,6 +68,59 @@ export function CartDrawer() {
 
   const shipping = 0
   const total = subtotal + shipping
+  const checkoutCurrency: CheckoutCurrency =
+    selectedCountry === "NG" ? "NGN" : selectedCountry === "GB" ? "GBP" : "USD"
+  const checkoutRate =
+    checkoutCurrency === "NGN" ? 1350 : checkoutCurrency === "GBP" ? gbpRate : 1
+  const canShowCheckoutPrices = checkoutRate !== null
+
+  useEffect(() => {
+    if (selectedCountry !== "GB") {
+      setGbpRate(null)
+      setGbpRateStatus("idle")
+      return
+    }
+
+    const controller = new AbortController()
+    setGbpRate(null)
+    setGbpRateStatus("loading")
+
+    const loadGbpRate = async () => {
+      try {
+        const response = await fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=GBP", {
+          signal: controller.signal,
+        })
+        if (!response.ok) {
+          throw new Error(`Exchange-rate service returned ${response.status}.`)
+        }
+
+        const data: unknown = await response.json()
+        if (
+          typeof data !== "object" ||
+          data === null ||
+          !("rates" in data) ||
+          typeof data.rates !== "object" ||
+          data.rates === null ||
+          !("GBP" in data.rates) ||
+          typeof data.rates.GBP !== "number" ||
+          !Number.isFinite(data.rates.GBP) ||
+          data.rates.GBP <= 0
+        ) {
+          throw new Error("The exchange-rate service returned an invalid GBP rate.")
+        }
+
+        setGbpRate(data.rates.GBP)
+        setGbpRateStatus("ready")
+      } catch (rateError) {
+        if (controller.signal.aborted) return
+        console.error("Unable to load the USD to GBP exchange rate.", rateError)
+        setGbpRateStatus("error")
+      }
+    }
+
+    void loadGbpRate()
+    return () => controller.abort()
+  }, [selectedCountry, gbpRateRetry])
 
   // Get countries from library
   const allCountries = useMemo(() => Country.getAllCountries(), [])
@@ -144,44 +211,10 @@ export function CartDrawer() {
     }
 
     setSubmitting(true)
-
+    setShowGatewayWarning(false)
     try {
-      const client = createClientBrowser()
-
-      const orderData = {
-        customer_name: customerName.trim(),
-        customer_phone: customerPhone.trim(),
-        customer_country: selectedCountryObj?.name || "Nigeria",
-        customer_state: countryStates.find((s) => s.isoCode === selectedState)?.name || "",
-        customer_address: customerAddress.trim(),
-        items: items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image,
-        })),
-        subtotal,
-        shipping,
-        total,
-        status: "pending",
-      }
-
-      const { data, error: insertError } = await client
-        .from("orders")
-        .insert([orderData])
-        .select()
-        .single()
-
-      if (insertError) throw insertError
-
-      clearCart()
-      setShowCheckoutModal(false)
-
-      router.push(`/invoice/${data.id}?token=${data.access_token}&fresh=1`)
-    } catch (err: any) {
-      console.error("Checkout error:", err)
-      setError(err?.message || "Something went wrong. Please try again.")
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+      setShowGatewayWarning(true)
     } finally {
       setSubmitting(false)
     }
@@ -198,7 +231,7 @@ export function CartDrawer() {
         <DrawerContent
           className={
             isMobile
-              ? "h-[85vh] max-h-[85vh] rounded-t-3xl border-t"
+              ? "h-[85vh] max-h-[85vh] rounded-t-xl border-t"
               : "h-full w-full sm:max-w-[440px]"
           }
         >
@@ -206,16 +239,16 @@ export function CartDrawer() {
             <div className="mx-auto mt-3 mb-1 h-1.5 w-12 shrink-0 rounded-full bg-muted-foreground/30" />
           )}
 
-          <DrawerHeader className="border-b border-border/50 p-4 sm:p-6 py-2.5">
-            <DrawerTitle className="font-serif text-xl sm:text-2xl">Cart</DrawerTitle>
-            <DrawerDescription>{itemCount} {itemCount === 1 ? 'item' : 'items'}</DrawerDescription>
+          <DrawerHeader className="border-b border-border px-5 py-4 sm:px-6">
+            <DrawerTitle className="font-sans text-lg font-semibold">Your cart</DrawerTitle>
+            <DrawerDescription className="text-xs">{itemCount} {itemCount === 1 ? 'item' : 'items'}</DrawerDescription>
           </DrawerHeader>
 
           <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <ShoppingBag className="w-12 h-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">Your cart is empty</p>
+                <ShoppingBag className="mb-4 h-10 w-10 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">Your cart is empty</p>
                 <DrawerClose asChild>
                   <button type="button" className="mt-4 text-primary hover:underline text-sm">
                     Continue Shopping
@@ -233,20 +266,25 @@ export function CartDrawer() {
                         fill
                         className="object-cover"
                       />
+                      {item.originalPrice && item.discountPercentage && (
+                        <span className="absolute right-1 top-1 rounded-sm bg-red-600 px-1.5 py-1 text-[9px] font-semibold uppercase leading-tight tracking-wide text-white">
+                          Save {item.discountPercentage}%
+                        </span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-serif text-sm sm:text-base text-foreground mb-0.5 sm:mb-1 font-semibold leading-tight">
+                      <h3 className="mb-1 text-sm font-medium leading-tight text-foreground">
                         {item.name}
                       </h3>
                       <p className="text-muted-foreground mb-2 sm:mb-3 text-xs sm:text-sm">
                         Premium quality hair product
                       </p>
                       <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="flex items-center border border-border rounded-full">
+                        <div className="flex items-center rounded-sm border border-border">
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="p-2 sm:p-1.5 hover:bg-muted boty-transition rounded-l-full touch-manipulation"
+                            className="rounded-l-sm p-2 transition-colors hover:bg-muted touch-manipulation"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
@@ -257,7 +295,7 @@ export function CartDrawer() {
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-2 sm:p-1.5 hover:bg-muted boty-transition rounded-r-full touch-manipulation"
+                            className="rounded-r-sm p-2 transition-colors hover:bg-muted touch-manipulation"
                             aria-label="Increase quantity"
                           >
                             <Plus className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
@@ -266,7 +304,7 @@ export function CartDrawer() {
                         <button
                           type="button"
                           onClick={() => removeItem(item.id)}
-                          className="p-2.5 sm:p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 boty-transition rounded-full touch-manipulation"
+                          className="rounded-sm p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive touch-manipulation"
                           aria-label="Remove item"
                         >
                           <Trash2 className="w-4 h-4 sm:w-4 sm:h-4" />
@@ -274,9 +312,23 @@ export function CartDrawer() {
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="font-medium text-foreground text-sm sm:text-base whitespace-nowrap">
-                        {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((item.price * item.quantity) || 0)}
-                      </p>
+                      {item.originalPrice && item.discountPercentage ? (
+                        <div className="flex flex-col items-end">
+                          <span className="whitespace-nowrap text-xs text-muted-foreground line-through">
+                            {formatCurrency(item.originalPrice * item.quantity, "USD")}
+                          </span>
+                          <span className="whitespace-nowrap text-sm font-medium text-foreground sm:text-base">
+                            {formatCurrency(item.price * item.quantity, "USD")}
+                          </span>
+                          <span className="whitespace-nowrap text-[10px] font-medium text-red-700">
+                            Save {item.discountPercentage}%
+                          </span>
+                        </div>
+                      ) : (
+                        <p className="whitespace-nowrap text-sm font-medium text-foreground sm:text-base">
+                          {formatCurrency(item.price * item.quantity, "USD")}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -304,7 +356,7 @@ export function CartDrawer() {
               <button
                 type="button"
                 onClick={openCheckout}
-                className="w-full bg-primary text-primary-foreground py-3.5 sm:py-4 rounded-full font-medium text-sm sm:text-base hover:bg-primary/90 boty-transition active:scale-[0.98] transition-transform touch-manipulation"
+                className="min-h-12 w-full rounded-sm bg-primary py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 touch-manipulation"
               >
                 Checkout
               </button>
@@ -312,7 +364,7 @@ export function CartDrawer() {
               <DrawerClose asChild>
                 <button
                   type="button"
-                  className="w-full border border-border text-foreground py-3.5 sm:py-4 rounded-full font-medium text-sm sm:text-base hover:bg-muted boty-transition active:scale-[0.98] transition-transform touch-manipulation"
+                  className="min-h-12 w-full rounded-sm border border-border py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted touch-manipulation"
                 >
                   Continue Shopping
                 </button>
@@ -323,34 +375,47 @@ export function CartDrawer() {
       </Drawer>
 
       {/* ── Checkout Modal ── */}
-      {showCheckoutModal && (
+      {showCheckoutModal && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-[100] flex h-[100dvh] w-screen items-stretch justify-stretch overflow-hidden"
           style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
         >
-          <div className="absolute inset-0" onClick={closeCheckout} />
+          <div
+            className="absolute inset-0"
+            onClick={() => {
+              if (!submitting) closeCheckout()
+            }}
+          />
 
           <div
-            className="relative bg-card rounded-2xl sm:rounded-3xl w-full max-w-lg max-h-[90dvh] overflow-y-auto boty-shadow border border-border/50 animate-in fade-in zoom-in-95 duration-200"
+            className="relative h-full w-full max-w-none overflow-x-hidden overflow-y-scroll overscroll-y-contain rounded-none border-0 bg-background animate-in fade-in duration-200"
+            data-lenis-prevent
+            style={{
+              height: "100dvh",
+              maxHeight: "100dvh",
+              WebkitOverflowScrolling: "touch",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-card z-10 flex items-center justify-between p-6 pb-4 border-b border-border/50">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background p-5 sm:p-6">
               <div>
-                <h2 className="font-serif text-xl sm:text-2xl text-foreground">Checkout</h2>
+                <h2 className="font-sans text-lg font-semibold text-foreground">Checkout</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">Enter your details to place the order</p>
               </div>
               <button
                 type="button"
                 onClick={closeCheckout}
-                className="w-8 h-8 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:text-foreground boty-transition"
+                disabled={submitting}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Close checkout"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleCheckout} className="p-6 space-y-5">
+            <form onSubmit={handleCheckout} className="space-y-5 p-6">
               {/* Full Name */}
               <div>
                 <label htmlFor="modalName" className="block text-sm font-medium text-foreground mb-1.5">
@@ -539,14 +604,58 @@ export function CartDrawer() {
                 <p className="text-sm font-medium text-foreground">Order Summary</p>
                 {items.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm text-muted-foreground">
-                    <span className="truncate mr-2">{item.name} × {item.quantity}</span>
-                    <span className="whitespace-nowrap">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((item.price * item.quantity) || 0)}</span>
+                    <span className="mr-2 min-w-0">
+                      <span className="block truncate">{item.name} × {item.quantity}</span>
+                      {item.originalPrice && item.discountPercentage && canShowCheckoutPrices && (
+                        <span className="block text-xs font-medium text-red-700">
+                          Save {item.discountPercentage}%
+                        </span>
+                      )}
+                    </span>
+                    <span className="whitespace-nowrap text-right">
+                      {item.originalPrice && item.discountPercentage && canShowCheckoutPrices && (
+                        <span className="mr-2 text-xs text-muted-foreground line-through">
+                          {formatCurrency(item.originalPrice * item.quantity * checkoutRate, checkoutCurrency)}
+                        </span>
+                      )}
+                      {canShowCheckoutPrices
+                        ? formatCurrency(item.price * item.quantity * checkoutRate, checkoutCurrency)
+                        : "Loading rate…"}
+                    </span>
                   </div>
                 ))}
                 <div className="border-t border-border/50 pt-2 mt-2 flex justify-between font-medium text-foreground">
                   <span>Total</span>
-                  <span>{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total || 0)}</span>
+                  <span>
+                    {canShowCheckoutPrices
+                      ? formatCurrency(total * checkoutRate, checkoutCurrency)
+                      : "Loading rate…"}
+                  </span>
                 </div>
+                {checkoutCurrency === "GBP" && gbpRateStatus === "ready" && gbpRate !== null && (
+                  <p className="text-xs text-muted-foreground">
+                      Latest available display rate: $1 USD = £{gbpRate.toFixed(4)} GBP. No order is placed until payment is configured.
+                  </p>
+                )}
+                {checkoutCurrency === "GBP" && gbpRateStatus === "error" && (
+                  <div className="flex items-center justify-between gap-3 text-xs text-destructive" role="alert">
+                    <span>Could not load the live GBP exchange rate.</span>
+                    <button
+                      type="button"
+                      onClick={() => setGbpRateRetry((attempt) => attempt + 1)}
+                      className="shrink-0 underline underline-offset-2"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
+                {checkoutCurrency !== "GBP" && (
+                  <p className="text-xs text-muted-foreground">
+                    {checkoutCurrency === "NGN"
+                      ? "Converted for display at $1 USD = ₦1,350. No order is placed until payment is configured."
+                      : "Prices are shown in USD. No order is placed until payment is configured."}
+                  </p>
+                )}
               </div>
 
               {/* Error */}
@@ -564,10 +673,12 @@ export function CartDrawer() {
                   {submitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Placing Order...
+                      Processing…
                     </>
                   ) : (
-                    `Place Order — ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total || 0)}`
+                    canShowCheckoutPrices
+                      ? `Continue to payment — ${formatCurrency(total * checkoutRate, checkoutCurrency)}`
+                      : "Continue to payment"
                   )}
                 </button>
                 <button
@@ -581,7 +692,25 @@ export function CartDrawer() {
               </div>
             </form>
           </div>
-        </div>
+          {showGatewayWarning && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 p-5" role="alertdialog" aria-modal="true" aria-labelledby="gateway-warning-title">
+              <div className="w-full max-w-sm rounded-lg bg-background p-6 text-center shadow-xl">
+                <h2 id="gateway-warning-title" className="text-lg font-semibold text-foreground">
+                  Payment gateway not configured yet.
+                </h2>
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => setShowGatewayWarning(false)}
+                  className="mt-5 min-h-11 w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </div>,
+        document.body,
       )}
     </>
   )

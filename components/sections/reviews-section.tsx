@@ -71,17 +71,17 @@ export function ReviewsSection() {
   }
 
   return (
-    <section id="reviews" ref={sectionRef} className="py-12 md:py-16 bg-background overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+    <section id="reviews" ref={sectionRef} className="overflow-hidden bg-muted py-14 sm:py-20">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
         {/* Header */}
-        <div ref={headerRef} className="text-center mb-8 md:mb-12 pb-8 md:pb-12 border-b border-border/30 rounded-b-3xl">
-          <span className={`text-sm tracking-[0.3em] uppercase text-primary mb-4 block ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
+        <div ref={headerRef} className="mb-8 max-w-2xl sm:mb-10">
+          <span className={`mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-primary ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
             Customer Reviews
           </span>
-          <h2 className={`font-serif text-4xl leading-tight text-foreground mb-6 text-balance md:text-7xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
+          <h2 className={`mb-3 font-sans text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-4xl md:text-5xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
             What our customers say
           </h2>
-          <p className={`text-base sm:text-lg text-muted-foreground leading-relaxed mx-auto max-w-2xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
+          <p className={`max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
             Real reviews from real customers who love our products
           </p>
         </div>
@@ -92,7 +92,7 @@ export function ReviewsSection() {
             <p className="text-muted-foreground">Loading reviews...</p>
           </div>
         ) : displayedReviews.length > 0 ? (
-          <div className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6 mb-10 md:mb-12 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`} style={isVisible ? { animationDelay: '0.8s', animationFillMode: 'forwards' } : {}}>
+          <div className={`mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 sm:mb-10 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`} style={isVisible ? { animationDelay: '0.8s', animationFillMode: 'forwards' } : {}}>
             {displayedReviews.map((review, index) => (
               <div
                 key={review.id}
@@ -116,7 +116,7 @@ export function ReviewsSection() {
         <div className="text-center mt-8 md:mt-10">
           <Link
             href="/reviews"
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 md:px-8 py-2.5 md:py-3 rounded-full text-xs md:text-sm font-medium tracking-wide hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             View All Reviews
             <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />

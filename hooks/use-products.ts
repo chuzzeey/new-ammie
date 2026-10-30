@@ -8,6 +8,7 @@ export interface ShopProduct {
   id: string
   name: string
   price: number
+  discountPercentage: number
   image: string
   badge: string | null
   category: string
@@ -20,6 +21,7 @@ function transformProduct(product: Product): ShopProduct {
     id: product.id,
     name: product.name,
     price: product.price,
+    discountPercentage: product.discount_percentage || 0,
     image: getOptimizedProductImage(rawImage, "card"),
     badge: product.badge,
     category: product.category,

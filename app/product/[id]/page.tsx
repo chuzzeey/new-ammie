@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const supabase = await createClientServer()
     const { data: product } = await supabase
       .from("products")
-      .select("name, description, images, price, rating, review_count")
+      .select("name, description, images, price, rating")
       .eq("id", id)
       .single()
 

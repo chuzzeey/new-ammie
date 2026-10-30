@@ -21,20 +21,13 @@ const footerLinks = {
 export function Footer() {
   const [modal, setModal] = useState<ModalType | null>(null)
   return (
-    <footer className="bg-card pt-20 pb-10 relative overflow-hidden">
-      {/* Giant Background Text */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none select-none z-0">
-        <span className="font-serif text-[200px] sm:text-[200px] md:text-[400px] lg:text-[400px] xl:text-[400px] font-bold text-white/20 whitespace-nowrap leading-none">
-          Ammie N
-        </span>
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-10 mb-16">
+    <footer className="relative overflow-hidden border-t border-border bg-background py-14 sm:py-16">
+      <div className="relative z-10 mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mb-12 grid grid-cols-2 gap-10 md:grid-cols-3">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <h2 className="font-serif text-3xl text-foreground mb-4">Ammie N</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+            <h2 className="mb-3 font-serif text-2xl text-foreground">Ammie N</h2>
+            <p className="mb-5 max-w-sm text-sm leading-6 text-muted-foreground">
               Premium wigs, lace fronts, and hair extensions for those who believe beauty should feel as good as it looks.
             </p>
             <div className="flex gap-4">
@@ -42,7 +35,7 @@ export function Footer() {
                 href="https://www.instagram.com/ammie_nwigs?igsh=MWR4NXJyeXB4dTlvZw=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition boty-shadow"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground/60 transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="Instagram"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,7 +48,7 @@ export function Footer() {
                 href="https://www.tiktok.com/@amysglamroom?_r=1&_t=ZS-988kqtnNJoq"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition boty-shadow"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground/60 transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="TikTok"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -67,7 +60,7 @@ export function Footer() {
                 href="https://www.facebook.com/share/1PFS4iCgiH/?mibextid=wwXIfr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition boty-shadow"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground/60 transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="Facebook"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -78,7 +71,7 @@ export function Footer() {
                 href="https://www.youtube.com/@TheAmmieN"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition boty-shadow"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground/60 transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="YouTube"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -91,13 +84,13 @@ export function Footer() {
 
           {/* Shop Links */}
           <div>
-            <h3 className="font-medium text-foreground mb-4">Shop</h3>
+            <h3 className="mb-4 text-sm font-semibold text-foreground">Shop</h3>
             <ul className="space-y-3">
               {footerLinks.shop.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground boty-transition"
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {link.name}
                   </Link>
@@ -108,21 +101,21 @@ export function Footer() {
 
           {/* Support Links */}
           <div>
-            <h3 className="font-medium text-foreground mb-4">Support</h3>
+            <h3 className="mb-4 text-sm font-semibold text-foreground">Support</h3>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   {link.name === "Shipping" ? (
                     <button
                       onClick={() => setModal("shipping")}
-                      className="text-sm text-muted-foreground hover:text-foreground boty-transition cursor-pointer"
+                      className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link.name}
                     </button>
                   ) : (
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground boty-transition"
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link.name}
                     </Link>
@@ -134,29 +127,29 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 border-t border-border/50">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex justify-center gap-6">
+        <div className="border-t border-border pt-5">
+          <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+            <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 sm:justify-start">
               <button
                 onClick={() => setModal("privacy")}
-                className="text-sm text-muted-foreground hover:text-foreground boty-transition cursor-pointer"
+                className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 Privacy Policy
               </button>
               <button
                 onClick={() => setModal("terms")}
-                className="text-sm text-muted-foreground hover:text-foreground boty-transition cursor-pointer"
+                className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 Terms of Service
               </button>
               <button
                 onClick={() => setModal("shipping")}
-                className="text-sm text-muted-foreground hover:text-foreground boty-transition cursor-pointer"
+                className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 Shipping
               </button>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">
+            <p className="text-xs text-muted-foreground">
               &copy; {new Date().getFullYear()} Ammie N. All Rights Reserved.
             </p>
           </div>

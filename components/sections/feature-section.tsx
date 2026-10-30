@@ -78,15 +78,15 @@ export function FeatureSection() {
   }, [])
 
   return (
-    <section className="py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="bg-muted py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div 
           ref={videoSectionRef}
-          className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center my-0 py-20"
+          className="grid items-center gap-8 sm:gap-12 lg:grid-cols-2 lg:gap-20"
         >
           {/* Image carousel */}
           <div 
-            className={`relative aspect-[4/5] overflow-hidden rounded-3xl boty-shadow transition-all duration-700 ease-out ${
+            className={`relative aspect-[4/5] overflow-hidden rounded-md transition-all duration-700 ease-out ${
               isVideoVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
           >
@@ -109,18 +109,18 @@ export function FeatureSection() {
           {/* Content */}
           <div
             ref={headerRef}
-            className={`transition-all duration-700 ease-out text-center lg:text-left ${
+            className={`transition-all duration-700 ease-out text-left ${
               isVideoVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
             style={{ transitionDelay: '100ms' }}
           >
-            <span className={`text-sm tracking-[0.3em] uppercase text-primary mb-4 block ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
+            <span className={`mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-primary ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
               Why Ammie Hair
             </span>
-            <h2 className={`font-serif text-4xl leading-tight text-foreground mb-6 text-balance md:text-7xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
+            <h2 className={`mb-5 font-sans text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-4xl md:text-5xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
               Hair that inspires.
             </h2>
-            <p className={`text-base sm:text-lg text-muted-foreground leading-relaxed mb-10 max-w-md mx-auto lg:mx-0 ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
+            <p className={`mb-8 max-w-md text-sm leading-7 text-muted-foreground sm:text-base ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
               We believe premium hair should feel natural, look flawless, and make you unstoppable.
               Every piece is crafted with the finest quality and care.
             </p>

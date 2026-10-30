@@ -9,25 +9,25 @@ export default function ContactPage() {
     <main className="min-h-screen">
       <Header />
 
-      <div className="pt-28 pb-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="pb-20 pt-32 sm:pt-40">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-16">
-            <span className="text-sm tracking-[0.3em] uppercase text-primary mb-4 block">
+          <div className="mb-12 max-w-2xl">
+            <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               Get In Touch
             </span>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-4 text-balance">
+            <h1 className="mb-4 font-sans text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
               Contact Us
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="max-w-2xl text-base leading-7 text-muted-foreground">
               Have a question or need assistance? We're here to help. Reach out to our team and we'll get back to you as soon as possible.
             </p>
           </div>
 
-          {/* Social Links */}
-          <div className="max-w-3xl mx-auto mb-16">
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)]">
+            <section>
+              <h2 className="mb-4 text-sm font-semibold text-foreground">Connect with us</h2>
+              <div className="divide-y divide-border border-y border-border">
               {[
                 {
                   name: "Instagram",
@@ -55,36 +55,36 @@ export default function ContactPage() {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-card boty-shadow hover:shadow-md transition-shadow duration-300"
+                  className="flex items-center justify-between py-4 transition-colors hover:text-muted-foreground"
                 >
-                  <img
-                    src={social.icon}
-                    alt={social.name}
-                    className="w-12 h-12 object-contain"
-                  />
-                  <span className="text-sm font-medium text-foreground">{social.name}</span>
+                  <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                    <img src={social.icon} alt="" className="h-7 w-7 object-contain" />
+                    {social.name}
+                  </span>
                 </a>
               ))}
-            </div>
-          </div>
+              </div>
+            </section>
 
-          {/* Additional Info */}
-          <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-10 md:p-14 text-center">
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-4">
-              We'd love to hear from you
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-              Whether you have a question about our products, need help with an order, or want to provide feedback, our team is ready to assist you.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <aside className="h-fit rounded-md bg-muted p-6 sm:p-8">
+              <h2 className="mb-2 font-sans text-xl font-medium text-foreground">We’re here to help</h2>
+              <p className="mb-6 text-sm leading-6 text-muted-foreground">
+                Questions about a product, your order, or finding the right fit? Reach out and we’ll be happy to help.
+              </p>
+              <a
+                href="mailto:amysglamroom@gmail.com"
+                className="mb-3 block break-all text-sm font-medium text-foreground underline underline-offset-4"
+              >
+                amysglamroom@gmail.com
+              </a>
               <a
                 href="tel:+2349031560905"
-                className="inline-flex items-center justify-center gap-2 bg-background text-foreground px-8 py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-background/80 boty-shadow border border-border"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                <Phone className="w-4 h-4" />
-                Call Us
+                <Phone className="h-4 w-4" />
+                Call us
               </a>
-            </div>
+            </aside>
           </div>
         </div>
       </div>

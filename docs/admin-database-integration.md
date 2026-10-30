@@ -72,7 +72,6 @@ CREATE TABLE products (
   images TEXT[], -- Array of Cloudinary URLs
   sizes TEXT, -- e.g., "14 inches, 18 inches, 22 inches"
   rating DECIMAL(2, 1) DEFAULT 5.0,
-  review_count INTEGER DEFAULT 0,
   details TEXT,
   how_to_use TEXT,
   ingredients TEXT,

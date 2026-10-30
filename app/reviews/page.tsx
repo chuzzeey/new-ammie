@@ -115,17 +115,17 @@ export default function ReviewsPage() {
     <main className="min-h-screen">
       <Header />
 
-      <div className="pt-24 pb-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="pb-20 pt-32 sm:pt-40">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
           {/* Header */}
-          <div ref={headerRef} className="text-center mb-16">
-            <span className={`text-sm tracking-[0.3em] uppercase text-primary mb-4 block ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
+          <div ref={headerRef} className="mb-10 max-w-2xl sm:mb-12">
+            <span className={`mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
               All Reviews
             </span>
-            <h1 className={`font-serif text-4xl leading-tight text-foreground text-balance md:text-7xl mb-4 ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
+            <h1 className={`mb-3 font-sans text-4xl font-medium leading-tight tracking-tight text-foreground sm:text-5xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
               Customer Reviews
             </h1>
-            <p className={`text-muted-foreground max-w-2xl mx-auto text-lg ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
+            <p className={`max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
               See what our customers are saying about their Ammie Hair experience
             </p>
           </div>
@@ -136,7 +136,7 @@ export default function ReviewsPage() {
               <p className="text-muted-foreground">Loading reviews...</p>
             </div>
           ) : currentReviews.length > 0 ? (
-            <div ref={sectionRef} className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`} style={isVisible ? { animationDelay: '0.8s', animationFillMode: 'forwards' } : {}}>
+            <div ref={sectionRef} className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`} style={isVisible ? { animationDelay: '0.8s', animationFillMode: 'forwards' } : {}}>
               {currentReviews.map((review, index) => (
                 <div
                   key={review.id}
@@ -158,30 +158,30 @@ export default function ReviewsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12">
+            <div className="mt-12 flex items-center justify-center gap-2">
               {/* Previous Button */}
               <button
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
-                className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-medium transition-all duration-200 ${
+                className={`flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium transition-colors ${
                   currentPage === 1
                     ? 'text-muted-foreground/20 cursor-not-allowed'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
 
               {/* Page Numbers */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
                 {getPageNumbers().map((page) => (
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-medium transition-all duration-200 ${
+                    className={`flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium transition-colors ${
                       currentPage === page
                         ? 'bg-foreground text-background'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                   >
                     {page}
@@ -193,10 +193,10 @@ export default function ReviewsPage() {
               <button
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-medium transition-all duration-200 ${
+                className={`flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium transition-colors ${
                   currentPage === totalPages
                     ? 'text-muted-foreground/20 cursor-not-allowed'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 <ChevronRight className="w-5 h-5" />

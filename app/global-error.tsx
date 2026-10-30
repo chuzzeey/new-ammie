@@ -26,8 +26,8 @@ export default function GlobalError({
           gap: 12,
           textAlign: "center",
           padding: 24,
-          background: "#F7F4EF",
-          color: "#1c1917",
+          background: "#ffffff",
+          color: "#121212",
           fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
         }}
       >
@@ -43,10 +43,10 @@ export default function GlobalError({
           style={{
             marginTop: 8,
             padding: "12px 24px",
-            borderRadius: 9999,
+            borderRadius: 4,
             border: "none",
-            background: "#1c1917",
-            color: "#F7F4EF",
+            background: "#121212",
+            color: "#ffffff",
             fontSize: 14,
             letterSpacing: "0.05em",
             cursor: "pointer",

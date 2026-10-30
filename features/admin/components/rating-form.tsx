@@ -4,11 +4,10 @@ import { Star, ChevronDown } from "lucide-react"
 
 interface RatingFormProps {
   rating: string
-  reviewCount: string
   onChange: (field: string, value: string) => void
 }
 
-export default function RatingForm({ rating, reviewCount, onChange }: RatingFormProps) {
+export default function RatingForm({ rating, onChange }: RatingFormProps) {
   const ratingValue = parseInt(rating) || 0
   
   return (
@@ -20,7 +19,7 @@ export default function RatingForm({ rating, reviewCount, onChange }: RatingForm
           <select
             value={rating}
             onChange={(e) => onChange("rating", e.target.value)}
-            className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer pr-8"
+            className="min-h-10 w-full cursor-pointer appearance-none rounded-sm border border-border bg-background px-3 py-2 pr-8 text-sm text-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
           >
             <option value="0">None</option>
             <option value="1">1 Star</option>
@@ -52,18 +51,6 @@ export default function RatingForm({ rating, reviewCount, onChange }: RatingForm
         )}
       </div>
 
-      {/* Review Count */}
-      <div className="pt-2">
-        <label className="text-sm font-medium text-foreground mb-1.5 block">Review Count</label>
-        <input
-          type="number"
-          value={reviewCount}
-          onChange={(e) => onChange("reviewCount", e.target.value)}
-          placeholder="Enter number"
-          min="0"
-          className="w-full bg-card border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary"
-        />
-      </div>
     </div>
   )
 }

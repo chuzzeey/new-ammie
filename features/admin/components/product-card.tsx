@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
   return (
-    <div className="bg-background rounded-3xl overflow-hidden boty-shadow border border-border/50 group">
+    <div className="group overflow-hidden rounded-md border border-border bg-background transition-shadow hover:shadow-md">
       <div className="relative aspect-square bg-muted overflow-hidden cursor-pointer">
         {product.images[0] && (
           <>
@@ -43,7 +43,7 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
         )}
       </div>
       <div className="p-4 cursor-pointer">
-        <h3 className="font-serif text-base text-foreground mb-1 truncate">{product.name}</h3>
+        <h3 className="mb-1 truncate text-sm font-medium text-foreground">{product.name}</h3>
         <div className="flex items-center gap-1 mb-3">
           {[...Array(5)].map((_, i) => (
             <Star
@@ -51,7 +51,6 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
               className={`w-3 h-3 ${i < Number(product.rating) ? "fill-primary text-primary" : "text-muted-foreground/30"}`}
             />
           ))}
-          <span className="text-xs text-muted-foreground ml-1">({product.reviewCount})</span>
         </div>
                       <div className="flex items-center gap-2 mb-3">
                         <span className="font-medium text-foreground">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(product.price) || 0)}</span>
@@ -60,7 +59,7 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
           <button
             type="button"
             onClick={() => onEdit(product)}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-card text-foreground px-3 py-2 rounded-full text-xs tracking-wide boty-transition hover:bg-card/80 border border-border/50 cursor-pointer"
+            className="inline-flex min-h-9 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-border px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
           >
             <Edit3 className="w-3.5 h-3.5" />
             Edit
@@ -68,7 +67,7 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
           <button
             type="button"
             onClick={() => onDelete(product.id)}
-            className="inline-flex items-center justify-center gap-1.5 bg-destructive/10 text-destructive px-3 py-2 rounded-full text-xs tracking-wide boty-transition hover:bg-destructive/20 cursor-pointer"
+            className="inline-flex min-h-9 cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-destructive/20 px-3 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

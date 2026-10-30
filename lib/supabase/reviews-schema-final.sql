@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS products (
   category TEXT NOT NULL CHECK (category IN ('ready_to_ship_braided_wigs', 'preorder_wigs', 'human_hair_wigs')),
   sizes TEXT DEFAULT '',
   rating DECIMAL(2, 1) DEFAULT 0.0,
-  review_count INTEGER DEFAULT 0,
+  discount_percentage INTEGER NOT NULL DEFAULT 0 CHECK (discount_percentage = 0 OR discount_percentage BETWEEN 5 AND 50),
   description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -109,23 +109,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_product_review_count(product_uuid UUID)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (
-    SELECT COALESCE(COUNT(*), 0)
-    FROM reviews
-    WHERE product_id = product_uuid AND is_approved = true
-  );
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION update_product_review_stats()
 RETURNS TRIGGER AS $$
+DECLARE
+  affected_product_id UUID;
 BEGIN
+  IF TG_OP = 'DELETE' OR (TG_OP = 'UPDATE' AND OLD.product_id IS DISTINCT FROM NEW.product_id) THEN
+    affected_product_id := OLD.product_id;
+    UPDATE products
+    SET rating = get_product_avg_rating(affected_product_id),
+        updated_at = NOW()
+    WHERE id = affected_product_id;
+  END IF;
+
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+
   UPDATE products
   SET
-    review_count = get_product_review_count(NEW.product_id),
     rating = get_product_avg_rating(NEW.product_id),
     updated_at = NOW()
   WHERE id = NEW.product_id;

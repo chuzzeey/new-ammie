@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useCart } from "@/components/providers/cart-context"
 import { useLatestProducts } from "@/hooks/use-products"
 import { supabase } from "@/lib/supabase"
+import { formatUsdPrice, getDiscountedPrice } from "@/lib/utils/product-pricing"
 
 interface FeaturedProduct {
   id: string
@@ -17,15 +18,8 @@ interface FeaturedProduct {
   badge: string | null
   category: string
   description: string
+  discountPercentage: number
 }
-
-const formatUsdPrice = (value: number | string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number(value) || 0)
 
 export function ProductGrid() {
   const { data: products = [], isLoading: loading } = useLatestProducts(6)
@@ -105,10 +99,13 @@ export function ProductGrid() {
     (e: React.MouseEvent, product: FeaturedProduct) => {
       e.preventDefault()
       e.stopPropagation()
+      const discountedPrice = getDiscountedPrice(product.price, product.discountPercentage)
       addItem({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: discountedPrice,
+        originalPrice: product.discountPercentage > 0 ? product.price : undefined,
+        discountPercentage: product.discountPercentage || undefined,
         image: product.image,
       })
     },
@@ -117,21 +114,21 @@ export function ProductGrid() {
 
   if (loading) {
     return (
-      <section className="py-24 bg-card">
+      <section className="py-16 bg-background sm:py-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="h-8 w-48 bg-muted animate-pulse rounded mx-auto mb-4"></div>
-            <div className="h-12 w-96 bg-muted animate-pulse rounded mx-auto mb-4"></div>
-            <div className="h-6 w-64 bg-muted animate-pulse rounded mx-auto"></div>
+          <div className="mb-10 text-left sm:mb-12">
+            <div className="mb-4 h-3 w-36 animate-pulse rounded bg-muted"></div>
+            <div className="mb-4 h-10 w-64 animate-pulse rounded bg-muted"></div>
+            <div className="h-4 w-56 animate-pulse rounded bg-muted"></div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-background rounded-3xl overflow-hidden">
+              <div key={i} className="overflow-hidden rounded-lg border border-border/70 bg-background">
                 <div className="aspect-square bg-muted animate-pulse"></div>
-                <div className="p-3 md:p-5">
+                <div className="p-3">
                   <div className="h-4 bg-muted animate-pulse rounded mb-2"></div>
-                  <div className="h-3 bg-muted animate-pulse rounded mb-4"></div>
-                  <div className="h-8 bg-muted animate-pulse rounded-full"></div>
+                  <div className="h-3 bg-muted animate-pulse rounded mb-3"></div>
+                  <div className="h-10 bg-muted animate-pulse rounded-md"></div>
                 </div>
               </div>
             ))}
@@ -144,38 +141,38 @@ export function ProductGrid() {
   const featuredProducts = products as FeaturedProduct[]
 
   return (
-    <section className="py-24 bg-card">
+    <section className="py-16 bg-background sm:py-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
-        <div ref={headerRef} className="text-center mb-16">
-          <span className={`text-sm tracking-[0.3em] uppercase text-primary mb-4 block ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
+        <div ref={headerRef} className="mb-10 text-left sm:mb-12">
+          <span className={`mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-primary ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.2s', animationFillMode: 'forwards' } : {}}>
             Featured Collection
           </span>
-          <h2 className={`font-serif leading-tight text-foreground mb-4 text-balance text-4xl md:text-7xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
-            Featured products
-          </h2>
-          <p className={`text-lg text-muted-foreground max-w-md mx-auto ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
-            Our newest arrivals, crafted for beauty and confidence
-          </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <h2 className={`font-sans text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-4xl ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.4s', animationFillMode: 'forwards' } : {}}>
+              Featured products
+            </h2>
+            <p className={`max-w-md text-sm text-muted-foreground sm:text-base ${headerVisible ? 'animate-blur-in opacity-0' : 'opacity-0'}`} style={headerVisible ? { animationDelay: '0.6s', animationFillMode: 'forwards' } : {}}>
+              Our newest arrivals, crafted for beauty and confidence
+            </p>
+          </div>
         </div>
 
         {/* Product Grid */}
         <div
           ref={gridRef}
-          className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
+          className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-x-6 md:gap-y-10 lg:grid-cols-4"
         >
           {featuredProducts.map((product, index) => (
-            <Link
+            <article
               key={product.id}
-              href={`/product/${product.id}`}
-              className={`group transition-all duration-500 ease-out ${
+              className={`group min-w-0 transition-all duration-500 ease-out ${
                 isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
               style={{ transitionDelay: `${index * 80}ms` }}
             >
-              <div className="bg-background rounded-3xl overflow-hidden boty-shadow boty-transition group-hover:scale-[1.02]">
-                {/* Image */}
-                <div className="relative aspect-square bg-muted overflow-hidden">
+                <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`}>
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted">
                   {/* Skeleton */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-br from-muted via-muted/50 to-muted animate-pulse transition-opacity duration-500 ${
@@ -195,9 +192,17 @@ export function ProductGrid() {
                     onLoad={() => setImageLoaded(prev => ({ ...prev, [product.id]: true }))}
                   />
                   {/* Badge */}
+                  {product.discountPercentage > 0 && (
+                    <span
+                      aria-label={`Save ${product.discountPercentage}%`}
+                      className="absolute right-3 top-3 rounded-sm bg-red-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white"
+                    >
+                      Save {product.discountPercentage}%
+                    </span>
+                  )}
                   {product.badge && (
                     <span
-                      className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs tracking-wide backdrop-blur-sm bg-white/70 ${
+                      className={`absolute left-3 top-3 rounded-sm bg-background/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
                         product.badge === "Sale"
                           ? "text-red-600"
                           : product.badge === "New"
@@ -208,43 +213,43 @@ export function ProductGrid() {
                       {product.badge}
                     </span>
                   )}
-                  {/* Quick add button */}
-                  <button
-                    type="button"
-                    className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 boty-transition boty-shadow"
-                    onClick={(e) => handleAddToCart(e, product)}
-                    aria-label="Add to cart"
-                  >
-                    <ShoppingBag className="w-4 h-4 text-foreground" />
-                  </button>
-                </div>
+                  </div>
+                </Link>
 
                 {/* Info */}
-                <div className="p-3 md:p-5 pb-4">
-                  <h3 className="font-serif text-sm md:text-lg text-foreground mb-0.5 md:mb-1">{product.name}</h3>
-                  <p className="text-xs md:text-sm text-muted-foreground mb-2 md:mb-3 line-clamp-2">{product.description ? product.description.split(' ').slice(0, 7).join(' ') + (product.description.split(' ').length > 7 ? '...' : '') : 'Premium quality hair product'}</p>
-                  <div className="flex items-center gap-2 mb-2 md:mb-4">
-                    <span className="text-xs md:text-base font-medium text-foreground">{formatUsdPrice(product.price)}</span>
-                  </div>
+                <div className="min-w-0 pt-3">
+                  <Link href={`/product/${product.id}`} className="block min-w-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <div className="min-w-0">
+                      <span className="line-clamp-2 break-words text-sm font-medium leading-5 text-foreground hover:underline md:text-base">
+                        {product.name}
+                      </span>
+                      <span className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-sm font-medium text-foreground">
+                        {product.discountPercentage > 0 && (
+                          <span className="text-xs text-muted-foreground line-through">{formatUsdPrice(product.price)}</span>
+                        )}
+                        <span className="break-words">{formatUsdPrice(getDiscountedPrice(product.price, product.discountPercentage))}</span>
+                      </span>
+                    </div>
+                    <p className="mt-1 line-clamp-1 break-words text-xs text-muted-foreground">{product.description || "Premium quality hair product"}</p>
+                  </Link>
                   <button
                     type="button"
                     onClick={(e) => handleAddToCart(e, product)}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3 py-1.5 md:px-4 md:py-2.5 rounded-full text-[10px] md:text-xs tracking-wide boty-transition hover:bg-primary/90 boty-shadow"
+                    className="mt-3 inline-flex min-h-10 w-full min-w-0 items-center justify-center gap-2 rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-xs font-medium text-foreground boty-transition hover:border-foreground hover:bg-foreground hover:text-background"
                   >
-                    <ShoppingBag className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                    Add to Cart
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Quick add
                   </button>
                 </div>
-              </div>
-            </Link>
+            </article>
           ))}
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-12">
+        <div className="mt-12 text-center">
           <Link
             href="/shop"
-            className="inline-flex items-center justify-center gap-2 bg-transparent border border-foreground/20 text-foreground px-8 py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-foreground/5"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-foreground/20 bg-transparent px-6 py-3 text-sm font-medium text-foreground boty-transition hover:bg-foreground/5"
           >
             View All Products
           </Link>

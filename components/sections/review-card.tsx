@@ -40,7 +40,7 @@ export function ReviewCard({ review, onViewMore, actionLabel = "View More" }: Re
 
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full cursor-pointer"
+      className="flex h-full cursor-pointer flex-col overflow-hidden rounded-md border border-border/80 bg-background transition-shadow duration-300 hover:shadow-md"
       onClick={handleNavigateToReview}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -53,7 +53,7 @@ export function ReviewCard({ review, onViewMore, actionLabel = "View More" }: Re
     >
       {/* Media Carousel */}
       {normalizedReview.media.length > 0 && (
-        <div className="relative bg-muted/30 rounded-t-2xl">
+        <div className="relative bg-muted">
           <div
             ref={mediaRef}
             onScroll={handleScroll}
@@ -119,64 +119,64 @@ export function ReviewCard({ review, onViewMore, actionLabel = "View More" }: Re
       )}
 
       {/* Review Content */}
-      <div className="p-2.5 md:p-4 flex flex-col flex-grow">
+      <div className="flex flex-grow flex-col p-4 sm:p-5">
         {/* Customer Info */}
-        <div className="flex items-center gap-1.5 mb-1">
+        <div className="mb-3 flex items-center gap-2">
           <Image
             src={normalizedReview.customerAvatar}
             alt={normalizedReview.customerName}
             width={20}
             height={20}
-            className="w-5 h-5 md:w-10 md:h-10 rounded-full object-cover flex-shrink-0"
+            className="h-9 w-9 flex-shrink-0 rounded-full object-cover"
           />
           <div className="flex-grow min-w-0">
-            <h3 className="font-semibold text-foreground text-[11px] md:text-sm truncate mb-0.5">{normalizedReview.customerName}</h3>
-            <p className="text-[10px] md:text-xs text-muted-foreground mb-0.5">{normalizedReview.location}</p>
+            <h3 className="mb-0.5 truncate text-sm font-medium text-foreground">{normalizedReview.customerName}</h3>
+            <p className="mb-1 text-xs text-muted-foreground">{normalizedReview.location}</p>
             <div className="flex items-center gap-0.5">
               {[...Array(normalizedReview.rating)].map((_, i) => (
-                <Star key={i} className="w-1.5 h-1.5 md:w-3 md:h-3 fill-yellow-400 text-yellow-400" />
+                <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
               ))}
             </div>
           </div>
         </div>
 
         {/* Comment */}
-        <p className="text-[9px] md:text-xs text-foreground/80 leading-relaxed mb-1.5 line-clamp-3 flex-grow">
+        <p className="mb-4 line-clamp-3 flex-grow text-sm leading-6 text-foreground/80">
           {normalizedReview.comment}
         </p>
 
-        <div className="mb-1.5 rounded-xl bg-muted/40 px-2 py-1.5">
-          <div className="mb-1 flex items-center gap-1 text-[8px] md:text-[10px] text-muted-foreground">
+        <div className="mb-3 rounded-sm bg-muted px-3 py-2">
+          <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <MessageCircle className="h-3 w-3" />
             <span>{commentCount} comment{commentCount === 1 ? "" : "s"}</span>
           </div>
           {firstComment && (
-            <p className="text-[9px] md:text-xs text-foreground/80 line-clamp-2">
+            <p className="line-clamp-2 text-xs leading-5 text-foreground/80">
               {firstComment.text}
             </p>
           )}
         </div>
 
         {/* Product Tag */}
-        <div className="mb-1.5 flex w-full items-center gap-1.5 pb-1.5 text-left opacity-100 select-none pointer-events-none">
-          <div className="flex h-6 w-6 md:h-10 md:w-10 items-center justify-center rounded-md bg-muted text-primary flex-shrink-0">
-            <Banknote className="h-3.5 w-3.5 md:h-5 md:w-5" />
+        <div className="mb-3 flex w-full items-center gap-2 text-left opacity-100 select-none pointer-events-none">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm bg-muted text-primary">
+            <Banknote className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[8px] md:text-xs text-muted-foreground">Purchased</p>
-            <p className="text-[9px] md:text-sm font-medium text-foreground truncate">{normalizedReview.productName}</p>
+            <p className="text-xs text-muted-foreground">Purchased</p>
+            <p className="truncate text-sm font-medium text-foreground">{normalizedReview.productName}</p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-center pt-1.5">
+        <div className="flex items-center justify-start border-t border-border pt-3">
           {onViewMore && (
             <button
               onClick={(e) => {
                 e.stopPropagation()
                 onViewMore(normalizedReview.id)
               }}
-              className="inline-flex items-center px-3 py-1.5 text-[10px] md:text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-full transition-all duration-200"
+              className="inline-flex items-center text-xs font-medium text-foreground underline underline-offset-4 transition-colors hover:text-primary"
             >
               <span>{actionLabel}</span>
             </button>

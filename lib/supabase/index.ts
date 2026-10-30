@@ -11,7 +11,7 @@ export interface Product {
   category: string
   sizes: string
   rating: number
-  review_count: number
+  discount_percentage: number
   description: string
   created_at: string
   updated_at: string
@@ -25,7 +25,7 @@ export interface ProductInsert {
   category: string
   sizes: string
   rating?: number
-  review_count?: number
+  discount_percentage?: number
   description?: string
 }
 

@@ -70,15 +70,13 @@ A modern, high-performance e-commerce platform for premium wigs, lace fronts, an
 - Browse products with real-time search
 - Product detail pages with image/video galleries
 - Shopping cart with persistent state
-- Secure checkout with order tracking
-- Invoice generation with WhatsApp vendor integration
+- Checkout form with cart and customer details preserved while payment is being configured
 - Responsive design for mobile, tablet, and desktop
 
 ### Shopping Experience
 - Add to cart / Buy Now flows
 - Quantity selection and size variants
-- Order confirmation with unique access tokens
-- Shareable invoice links
+- Payment gateway placeholder with a processing state and setup notice
 - Real-time cart drawer with smooth animations
 
 ### Admin Features
@@ -314,9 +312,6 @@ ammie-store/
 │   │   └── page.tsx              # Contact page
 │   ├── faq/
 │   │   └── page.tsx              # FAQ page
-│   ├── invoice/
-│   │   └── [id]/
-│   │       └── page.tsx          # Order invoice
 │   ├── product/
 │   │   └── [id]/
 │   │       ├── page.tsx          # Product detail (ISR + Streaming)
@@ -450,7 +445,6 @@ ammie-store/
 
 ### Dynamic Routes
 - **`/product/[id]`** — Dynamic product pages with ISR
-- **`/invoice/[id]`** — Dynamic invoice pages
 
 ### Lazy Loading
 - **VideoPlayer** — Code-split with `next/dynamic`, loaded only when product has video
@@ -604,7 +598,6 @@ Middleware (proxy.ts)
 | `category` | TEXT | Product category |
 | `sizes` | TEXT | Comma-separated sizes |
 | `rating` | INTEGER | Average rating (1-5) |
-| `review_count` | INTEGER | Number of reviews |
 | `description` | TEXT | Product description |
 | `created_at` | TIMESTAMP | Creation time |
 | `updated_at` | TIMESTAMP | Last update time |
@@ -627,16 +620,15 @@ Middleware (proxy.ts)
 | `customer_state` | TEXT | State/region |
 | `customer_address` | TEXT | Delivery address |
 | `items` | JSONB | Array of order items |
-| `subtotal` | INTEGER | Subtotal in kobo |
-| `shipping` | INTEGER | Shipping cost in kobo |
-| `total` | INTEGER | Total in kobo |
-| `status` | TEXT | Order status (pending, delivered, cancelled) |
-| `access_token` | TEXT | Unique token for invoice access |
+| `subtotal` | NUMERIC | Subtotal in USD |
+| `shipping` | NUMERIC | Shipping cost in USD |
+| `total` | NUMERIC | Total in USD |
+| `status` | TEXT | Order status (pending, processing, completed, cancelled) |
 | `created_at` | TIMESTAMP | Order time |
 
 **Indexes:**
 - `id` (primary key)
-- `access_token` (for invoice lookup)
+- `status, created_at` (for payment activity)
 
 ### Relationships
 - **products** → **orders** (one-to-many via `items` JSONB)
@@ -943,4 +935,3 @@ Proprietary — All rights reserved. This project is confidential and intended f
 - WhatsApp: +234 903 156 0905
 
 ---
-

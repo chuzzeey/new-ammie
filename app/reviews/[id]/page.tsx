@@ -298,29 +298,29 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
     <main className="min-h-screen">
       <Header />
 
-      <div className="pt-30 pb-16 sm:pt-30 sm:pb-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div className="pb-16 pt-32 sm:pb-20 sm:pt-40">
+        <div className="mx-auto max-w-4xl px-5 lg:px-8">
           {/* Back Button */}
           <Link
             href="/#reviews"
-            className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:mb-6"
+            className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronLeft className="h-4 w-4" />
             <span>Back to Reviews</span>
           </Link>
 
           {/* Review Card - Full Size */}
-          <div className="overflow-hidden rounded-[1.5rem] border border-border/50 bg-white shadow-xl">
+          <div className="overflow-hidden rounded-md border border-border bg-background">
             {/* Media Carousel */}
             {review.media.length > 0 && (
-              <div className="relative bg-muted/30 p-3 sm:p-4">
+              <div className="relative bg-muted p-3 sm:p-4">
                 <div className="mb-3 flex items-center justify-between px-1">
                   <p className="text-sm font-medium text-foreground">Customer photos</p>
                   <span className="text-xs text-muted-foreground">Tap to expand</span>
                 </div>
 
                 <div
-                  className="relative overflow-hidden rounded-[1.25rem] border border-border/60 bg-background"
+                  className="relative overflow-hidden rounded-sm border border-border bg-background"
                   onTouchStart={handleGalleryTouchStart}
                   onTouchEnd={handleGalleryTouchEnd}
                 >
@@ -402,7 +402,7 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
                         scrollToThumbnail(index)
                         if (index === currentMediaIndex) openModal(index)
                       }}
-                      className="group relative flex-shrink-0 snap-center overflow-hidden rounded-2xl border border-border/60 bg-muted shadow-sm"
+                      className="group relative flex-shrink-0 snap-center overflow-hidden rounded-sm border border-border bg-muted"
                     >
                       <div className="relative h-24 w-24 overflow-hidden sm:h-28 sm:w-28 md:h-32 md:w-32">
                         {media.type === 'image' ? (
@@ -497,9 +497,9 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
               </div>
 
               {/* Product Tag */}
-              <div className="mb-6 flex items-center gap-3 rounded-2xl bg-muted/50 p-4 opacity-100 pointer-events-none select-none">
-                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-muted text-primary">
-                  <Banknote className="h-7 w-7" />
+              <div className="mb-6 flex items-center gap-3 rounded-sm bg-muted p-4 opacity-100 pointer-events-none select-none">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-sm bg-background text-foreground">
+                  <Banknote className="h-5 w-5" />
                 </div>
                 <div>
                   <p className="mb-1 text-xs text-muted-foreground">Purchased Product</p>
@@ -536,14 +536,14 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
                         placeholder="Write a comment..."
-                        className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="w-full resize-none rounded-sm border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
                         rows={2}
                       />
                       <div className="mt-2 flex justify-end">
                         <button
                           type="submit"
                           disabled={!commentText.trim() || isSubmittingComment}
-                          className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="inline-flex min-h-10 items-center gap-2 rounded-sm bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <Send className="h-4 w-4" />
                           {isSubmittingComment ? "Posting..." : "Post Comment"}

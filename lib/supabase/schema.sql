@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS products (
   category TEXT NOT NULL CHECK (category IN ('ready_to_ship_braided_wigs', 'preorder_wigs', 'human_hair_wigs')),
   sizes TEXT,
   rating DECIMAL(2, 1) DEFAULT 5.0,
-  review_count INTEGER DEFAULT 0,
+  discount_percentage INTEGER NOT NULL DEFAULT 0 CHECK (discount_percentage = 0 OR discount_percentage BETWEEN 5 AND 50),
   description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -84,7 +84,6 @@ CREATE TABLE IF NOT EXISTS orders (
   shipping DECIMAL(10, 2) NOT NULL DEFAULT 0,
   total DECIMAL(10, 2) NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'cancelled')),
-  access_token TEXT NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -95,8 +94,10 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 -- Index for searching by customer phone
 CREATE INDEX IF NOT EXISTS idx_orders_customer_phone ON orders(customer_phone);
 
--- Index for access token lookups
-CREATE INDEX IF NOT EXISTS idx_orders_access_token ON orders(access_token);
+DROP FUNCTION IF EXISTS public.create_checkout_order(
+  TEXT, TEXT, TEXT, TEXT, TEXT, JSONB, NUMERIC, NUMERIC, NUMERIC
+);
+DROP FUNCTION IF EXISTS public.get_order_by_access_token(UUID, TEXT);
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
@@ -105,21 +106,27 @@ CREATE OR REPLACE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
 -- RLS: Allow anonymous users to insert orders (they don't need auth)
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
--- Anyone can insert an order (checkout flow is public)
-CREATE POLICY "Anyone can insert orders"
-ON orders FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Anyone can insert orders" ON orders;
+DROP POLICY IF EXISTS "Anyone can view orders by ID" ON orders;
+DROP POLICY IF EXISTS "Anyone can view orders" ON orders;
+DROP POLICY IF EXISTS "Admins can update orders" ON orders;
+DROP POLICY IF EXISTS "Admins can delete orders" ON orders;
+DROP POLICY IF EXISTS "Checkout can create orders" ON orders;
+DROP POLICY IF EXISTS "Authenticated users can manage orders" ON orders;
 
--- Anyone can view their own order by ID
-CREATE POLICY "Anyone can view orders by ID"
-ON orders FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can manage orders"
+ON orders FOR ALL TO authenticated
+USING (auth.role() = 'authenticated')
+WITH CHECK (auth.role() = 'authenticated');
 
--- Only authenticated admins can update orders
-CREATE POLICY "Admins can update orders"
-ON orders FOR UPDATE USING (auth.role() = 'authenticated');
-
--- Only authenticated admins can delete orders
-CREATE POLICY "Admins can delete orders"
-ON orders FOR DELETE USING (auth.role() = 'authenticated');
+REVOKE ALL ON orders FROM anon, PUBLIC;
+GRANT SELECT, INSERT, UPDATE, DELETE ON orders TO authenticated;
 
 -- Enable real-time for orders table
-ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+EXCEPTION WHEN duplicate_object THEN
+  NULL;
+END;
+$$;

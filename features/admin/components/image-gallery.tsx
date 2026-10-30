@@ -3,7 +3,8 @@
 import { useState, useRef } from "react"
 import Image from "next/image"
 import { Plus, X, Upload, Camera, Play } from "lucide-react"
-import { uploadToCloudinary, transformImageUrl, isVideoUrl, getVideoPosterUrl, getOptimizedVideoUrl } from "@/lib/cloudinary"
+import { transformImageUrl, isVideoUrl, getVideoPosterUrl } from "@/lib/cloudinary"
+import { uploadProductImageToSupabase } from "@/lib/supabase/product-image-upload"
 
 interface ImageGalleryProps {
   images: string[]
@@ -75,7 +76,7 @@ export default function ImageGallery({ images, selectedImageIndex, onSelectImage
       const uploadedUrls: string[] = await Promise.all(
         filesArray.map(async (file, i) => {
           setUploadProgress({ current: i + 1, total: filesArray.length })
-          return uploadToCloudinary(file)
+          return uploadProductImageToSupabase(file)
         })
       )
 
@@ -152,7 +153,11 @@ export default function ImageGallery({ images, selectedImageIndex, onSelectImage
         {/* Main Image */}
         <div className="flex flex-col gap-3 flex-1">
           <div
-            className="relative w-full h-full rounded-3xl overflow-hidden bg-card boty-shadow flex items-center justify-center cursor-pointer"
+            className={`relative flex h-full w-full items-center justify-center overflow-hidden boty-shadow cursor-pointer ${
+              images[0]
+                ? "rounded-3xl bg-card"
+                : "rounded-md border border-border bg-muted/30 transition-colors hover:bg-muted/50"
+            }`}
             onClick={() => setShowUploadOptions(0)}
           >
             {images[0] ? (
@@ -241,11 +246,15 @@ export default function ImageGallery({ images, selectedImageIndex, onSelectImage
                 setShowUploadOptions(0)
               }
             }}
-            className={`relative w-16 h-16 md:w-[76px] md:h-[76px] rounded-xl overflow-hidden boty-transition flex items-center justify-center cursor-pointer ${
+            className={`relative flex h-16 w-16 items-center justify-center overflow-hidden boty-transition cursor-pointer md:h-[76px] md:w-[76px] ${
               selectedImageIndex === 0
                 ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
                 : "opacity-60 hover:opacity-100"
-            } ${images[0] ? "bg-transparent" : "bg-card border border-dashed border-border"}`}
+            } ${
+              images[0]
+                ? "rounded-xl bg-transparent"
+                : "rounded-md border border-border bg-muted/30 hover:bg-muted/50"
+            }`}
           >
             {images[0] ? (
               <>
@@ -290,11 +299,15 @@ export default function ImageGallery({ images, selectedImageIndex, onSelectImage
                   handleThumbnailClick(index + 1)
                 }
               }}
-              className={`relative w-16 h-16 md:w-[76px] md:h-[76px] rounded-xl overflow-hidden boty-transition flex items-center justify-center cursor-pointer ${
+              className={`relative flex h-16 w-16 items-center justify-center overflow-hidden boty-transition cursor-pointer md:h-[76px] md:w-[76px] ${
                 selectedImageIndex === index + 1
                   ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
                   : "opacity-60 hover:opacity-100"
-              } ${img ? "bg-transparent" : "bg-card border border-dashed border-border"}`}
+              } ${
+                img
+                  ? "rounded-xl bg-transparent"
+                  : "rounded-md border border-border bg-muted/30 hover:bg-muted/50"
+              }`}
             >
               {img ? (
                 <>

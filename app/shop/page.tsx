@@ -11,23 +11,16 @@ import { Footer } from "@/components/layout/footer"
 import { useCart } from "@/components/providers/cart-context"
 import { useProducts, type ShopProduct } from "@/hooks/use-products"
 import { supabase } from "@/lib/supabase"
+import { formatUsdPrice, getDiscountedPrice } from "@/lib/utils/product-pricing"
 
 const categories = ["all", "ready_to_ship_braided_wigs", "preorder_wigs", "human_hair_wigs"] as const
 
 const categoryLabels: Record<string, string> = {
-  all: "All products/Wigs",
-  ready_to_ship_braided_wigs: "Ready to ship braided wigs",
-  preorder_wigs: "Preorder wigs",
-  human_hair_wigs: "Human hair wigs",
+  all: "All products",
+  ready_to_ship_braided_wigs: "Ready to ship",
+  preorder_wigs: "Pre-order",
+  human_hair_wigs: "Human hair",
 }
-
-const formatUsdPrice = (value: number | string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number(value) || 0)
 
 function ProductCard({ 
   product, 
@@ -45,27 +38,28 @@ function ProductCard({
     (e: React.MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
+      const discountedPrice = getDiscountedPrice(product.price, product.discountPercentage)
       addItem({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: discountedPrice,
+        originalPrice: product.discountPercentage > 0 ? product.price : undefined,
+        discountPercentage: product.discountPercentage || undefined,
         image: product.image,
       })
     },
-    [addItem, product.id, product.name, product.price, product.image]
+    [addItem, product.id, product.name, product.price, product.discountPercentage, product.image]
   )
 
   return (
-    <Link
-      href={`/product/${product.id}`}
-      className={`group transition-all duration-700 ease-out ${
+    <article
+      className={`group min-w-0 transition-all duration-700 ease-out ${
         isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
       }`}
       style={{ transitionDelay: `${index * 80}ms` }}
     >
-      <div className="bg-background rounded-3xl overflow-hidden boty-shadow boty-transition group-hover:scale-[1.02]">
-        {/* Image */}
-        <div className="relative aspect-square bg-muted overflow-hidden">
+      <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`}>
+        <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted">
           {/* Skeleton */}
           <div 
             className={`absolute inset-0 bg-gradient-to-br from-muted via-muted/50 to-muted animate-pulse transition-opacity duration-500 ${
@@ -83,10 +77,18 @@ function ProductCard({
             }`}
             onLoad={() => setImageLoaded(true)}
           />
+          {product.discountPercentage > 0 && (
+            <span
+              aria-label={`Save ${product.discountPercentage}%`}
+              className="absolute right-3 top-3 rounded-sm bg-red-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white"
+            >
+              Save {product.discountPercentage}%
+            </span>
+          )}
           {/* Badge */}
           {product.badge && (
             <span
-              className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs tracking-wide backdrop-blur-sm bg-white/70 ${
+              className={`absolute left-3 top-3 rounded-sm bg-background/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
                 product.badge === "Sale"
                   ? "text-red-600"
                   : product.badge === "New"
@@ -98,25 +100,34 @@ function ProductCard({
             </span>
           )}
         </div>
+      </Link>
 
-        {/* Info */}
-        <div className="p-3 md:p-5 pb-4">
-          <h3 className="font-serif text-sm md:text-lg text-foreground mb-0.5 md:mb-1">{product.name}</h3>
-          <p className="text-xs md:text-sm text-muted-foreground mb-2 md:mb-3 line-clamp-2">{product.description ? product.description.split(' ').slice(0, 7).join(' ') + (product.description.split(' ').length > 7 ? '...' : '') : 'Premium quality hair product'}</p>
-          <div className="flex items-center gap-2 mb-2 md:mb-4">
-            <span className="text-xs md:text-base font-medium text-foreground">{formatUsdPrice(product.price)}</span>
+      {/* Info */}
+      <div className="min-w-0 pt-3">
+        <Link href={`/product/${product.id}`} className="block min-w-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <div className="min-w-0">
+            <span className="line-clamp-2 break-words text-sm font-medium leading-5 text-foreground hover:underline md:text-base">
+              {product.name}
+            </span>
+            <span className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-sm font-medium text-foreground">
+              {product.discountPercentage > 0 && (
+                <span className="text-xs text-muted-foreground line-through">{formatUsdPrice(product.price)}</span>
+              )}
+              <span className="break-words">{formatUsdPrice(getDiscountedPrice(product.price, product.discountPercentage))}</span>
+            </span>
           </div>
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3 py-1.5 md:px-4 md:py-2.5 rounded-full text-[10px] md:text-xs tracking-wide boty-transition hover:bg-primary/90 boty-shadow"
-          >
-            <ShoppingBag className="w-3 h-3 md:w-3.5 md:h-3.5" />
-            Add to Cart
-          </button>
-        </div>
+          <p className="mt-1 line-clamp-1 break-words text-xs text-muted-foreground">{product.description || "Premium quality hair product"}</p>
+        </Link>
+        <button
+          type="button"
+          onClick={handleAdd}
+          className="mt-3 inline-flex min-h-10 w-full min-w-0 items-center justify-center gap-2 rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-xs font-medium text-foreground boty-transition hover:border-foreground hover:bg-foreground hover:text-background"
+        >
+          <ShoppingBag className="h-3.5 w-3.5" />
+          Quick add
+        </button>
       </div>
-    </Link>
+    </article>
   )
 }
 
@@ -273,50 +284,41 @@ function ShopPageContent() {
     <main className="min-h-screen overflow-x-hidden">
       <Header />
       
-      <div className="pt-28 pb-20">
+      <div className="pb-20 pt-32 sm:pt-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           {/* Page Header */}
-          <div className="text-center mb-12 md:mb-16">
-            <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-4">Shop</h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+          <div className="mb-10 max-w-2xl md:mb-14">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">Ammie N collection</p>
+            <h1 className="mb-3 font-sans text-4xl font-medium tracking-tight text-foreground sm:text-5xl">Shop all</h1>
+            <p className="text-sm leading-6 text-muted-foreground sm:text-base">
               Discover our premium collection of wigs, lace fronts, and hair extensions
             </p>
           </div>
 
           {/* Category Filter */}
-          <div className="mb-8 md:mb-12">
-            <div className="w-full max-w-xs md:max-w-sm">
-              <label htmlFor="shop-category-select" className="mb-2 block text-left text-sm font-medium text-foreground">
-                Categories
-              </label>
-              <div className="relative">
-                <select
-                  id="shop-category-select"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-3 pr-10 text-left text-sm font-medium text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          <nav aria-label="Filter products by category" className="mb-8 overflow-x-auto border-b border-border md:mb-10">
+            <div className="flex min-w-max gap-6">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  aria-pressed={selectedCategory === category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`border-b-2 px-1 pb-3 text-sm transition-colors ${
+                    selectedCategory === category
+                      ? "border-foreground font-medium text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
                 >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {categoryLabels[category]}
-                    </option>
-                  ))}
-                </select>
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                >
-                  <path d="M5.25 7.5 10 12.25 14.75 7.5H5.25Z" />
-                </svg>
-              </div>
+                  {categoryLabels[category]}
+                </button>
+              ))}
             </div>
-          </div>
+          </nav>
 
           {/* Results count */}
-          <div className="mb-6">
-            <p className="text-sm text-muted-foreground">
+          <div className="mb-5 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground sm:text-sm">
               Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
               {selectedCategory !== "all" && ` in ${selectedCategoryLabel}`}
             </p>

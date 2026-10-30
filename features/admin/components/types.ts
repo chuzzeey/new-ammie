@@ -6,7 +6,6 @@ export type ProductForm = {
   images: string[]
   sizes: string
   rating: string
-  reviewCount: string
   description: string
   category: string
 }
@@ -23,7 +22,6 @@ export const emptyForm: ProductForm = {
   images: ["", "", "", "", ""],
   sizes: "",
   rating: "0",
-  reviewCount: "",
   description: "",
   category: "ready_to_ship_braided_wigs"
 }

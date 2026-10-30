@@ -64,7 +64,7 @@ export default function AdminUpdatePasswordPage() {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {error && (
-          <div className="bg-destructive/10 text-destructive text-sm rounded-full px-4 py-3 text-center">
+          <div className="rounded-sm border border-destructive/20 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
             {error}
           </div>
         )}
@@ -82,7 +82,7 @@ export default function AdminUpdatePasswordPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
               required
-              className="w-full bg-background border border-border rounded-full pl-4 pr-12 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+              className="min-h-12 w-full rounded-sm border border-border bg-background py-3 pl-4 pr-12 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground sm:text-base"
             />
             <button
               type="button"
@@ -107,14 +107,14 @@ export default function AdminUpdatePasswordPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Repeat your new password"
             required
-            className="w-full bg-background border border-border rounded-full pl-4 pr-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+            className="min-h-12 w-full rounded-sm border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground sm:text-base"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-sm bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <>

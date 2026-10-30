@@ -11,7 +11,6 @@ export interface ProductInput {
   category: string
   images: string[]
   rating: number
-  review_count: number
   sizes: string
   badge?: string | null
   description?: string
@@ -36,7 +35,6 @@ export function validateProduct(input: {
   category: string
   images: string[]
   rating: string
-  reviewCount: string
   sizes: string
   badge?: string
   description?: string
@@ -84,17 +82,6 @@ export function validateProduct(input: {
     }
   }
 
-  // Review count validation
-  const trimmedReviewCount = input.reviewCount.trim()
-  if (!trimmedReviewCount) {
-    errors.push({ field: 'reviewCount', message: 'Review count is required' })
-  } else {
-    const reviewCountNum = parseInt(trimmedReviewCount, 10)
-    if (isNaN(reviewCountNum) || reviewCountNum < 0) {
-      errors.push({ field: 'reviewCount', message: 'Review count must be a non-negative integer' })
-    }
-  }
-
   // If there are errors, return early
   if (errors.length > 0) {
     return {
@@ -110,7 +97,6 @@ export function validateProduct(input: {
     category: trimmedCategory,
     images: processedMedia.media,
     rating: parseFloat(trimmedRating),
-    review_count: parseInt(trimmedReviewCount, 10),
     sizes: input.sizes.trim(),
     badge: input.badge?.trim() || null,
     description: input.description?.trim() || ''
@@ -148,12 +134,6 @@ export function validateField(field: string, value: string): string | null {
       if (!value.trim()) return 'Rating is required'
       const rating = parseFloat(value)
       if (isNaN(rating) || rating < 0 || rating > 5) return 'Rating must be 0-5'
-      return null
-
-    case 'reviewCount':
-      if (!value.trim()) return 'Review count is required'
-      const count = parseInt(value, 10)
-      if (isNaN(count) || count < 0) return 'Review count must be 0 or more'
       return null
 
     default:

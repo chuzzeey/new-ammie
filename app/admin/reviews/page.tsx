@@ -585,16 +585,17 @@ export default function AdminReviewsPage() {
 
       <div className="pt-35 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-10">
+          <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-foreground mb-1 sm:mb-2">Review Manager</h1>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Store management</p>
+              <h1 className="mb-1 font-sans text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Reviews</h1>
               <p className="text-sm sm:text-base text-muted-foreground">Add and edit customer reviews</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Link
                 href="/admin"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border border-foreground/20 text-foreground px-5 sm:px-6 py-3 rounded-full text-sm tracking-wide boty-transition hover:bg-foreground/5 cursor-pointer"
+                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-sm border border-border px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted sm:w-auto"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
@@ -602,7 +603,7 @@ export default function AdminReviewsPage() {
               <button
                 type="button"
                 onClick={openAddReviewForm}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 sm:px-6 py-3 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow cursor-pointer"
+                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-sm bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
               >
                 <Plus className="w-4 h-4" />
                 Add Review
@@ -615,11 +616,11 @@ export default function AdminReviewsPage() {
               resetReviewForm()
             }
           }}>
-            <DialogContent className="w-[min(96vw,1600px)] max-w-none sm:max-w-[95vw] md:max-w-[1400px] lg:max-w-[1500px] p-0 overflow-hidden rounded-[32px] border border-border/50 bg-card shadow-2xl">
+            <DialogContent className="w-[min(96vw,1600px)] max-w-none overflow-hidden rounded-md border border-border bg-background p-0 shadow-2xl sm:max-w-[95vw] md:max-w-[1400px] lg:max-w-[1500px]">
               <div className="grid grid-cols-1 lg:grid-cols-[460px_minmax(0,1fr)] max-h-[90vh] overflow-hidden">
-                <div className="bg-muted/40 p-6 md:p-7 lg:p-8 border-b lg:border-b-0 lg:border-r border-border/50 overflow-y-auto lg:min-h-0">
+                <div className="overflow-y-auto border-b border-border bg-muted p-5 sm:p-6 lg:min-h-0 lg:border-b-0 lg:border-r">
                   <div className="mb-5">
-                    <h3 className="font-serif text-xl text-foreground">Review Images</h3>
+                    <h3 className="font-sans text-lg font-semibold text-foreground">Review images</h3>
                     <p className="text-xs text-muted-foreground mt-1">Add between 1 and {MAX_REVIEW_IMAGES} images for this review</p>
                   </div>
 

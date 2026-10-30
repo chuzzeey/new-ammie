@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Search, X } from "lucide-react"
 import { useProducts } from "@/hooks/use-products"
+import { formatUsdPrice, getDiscountedPrice } from "@/lib/utils/product-pricing"
 
 interface SearchOverlayProps {
   isOpen: boolean
@@ -40,7 +41,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     >
       {/* Backdrop with blur - outside the dropdown */}
       <div
-        className={`absolute inset-0 bg-black/60 backdrop-blur-lg boty-transition ${
+        className={`absolute inset-0 bg-black/40 backdrop-blur-sm boty-transition ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}
@@ -52,15 +53,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           isOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         }`}
       >
-        <div className="max-w-3xl mx-auto px-4 pt-20 sm:pt-24">
+        <div className="mx-auto max-w-3xl px-3 pt-16 sm:px-5 sm:pt-20">
           {/* Card - solid bg matching site */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative bg-background border border-border/50 rounded-2xl sm:rounded-3xl overflow-hidden"
-            style={{ boxShadow: 'rgba(0, 0, 0, 0.1) 0px 20px 60px' }}
+            className="relative overflow-hidden rounded-md border border-border bg-background shadow-xl"
           >
             {/* Content */}
-            <div className="p-5 sm:p-6">
+            <div className="p-4 sm:p-5">
               {/* Search Input */}
               <div className="relative">
                 <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -70,7 +70,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search wigs, lace, extensions..."
-                  className="w-full bg-card border border-border/50 rounded-xl sm:rounded-2xl pl-12 sm:pl-14 pr-12 sm:pr-14 py-3.5 sm:py-4 text-base sm:text-lg text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 boty-transition boty-shadow"
+                  className="min-h-12 w-full rounded-sm border border-border bg-background py-3 pl-11 pr-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground sm:text-base"
                 />
                 {query && (
                   <button
@@ -90,15 +90,15 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             {query.trim() && (
               <div className="border-t border-border/50">
                 {filtered.length > 0 ? (
-                  <div className="p-3 sm:p-4 space-y-2 max-h-[50vh] overflow-y-auto">
+                  <div className="max-h-[55vh] space-y-1 overflow-y-auto border-t border-border p-2 sm:p-3">
                     {filtered.map((product) => (
                       <Link
                         key={product.id}
                         href={`/product/${product.id}`}
                         onClick={onClose}
-                        className="flex items-center gap-3 sm:gap-4 p-3 rounded-xl hover:bg-card boty-transition group"
+                        className="group flex items-center gap-3 rounded-sm p-3 transition-colors hover:bg-muted sm:gap-4"
                       >
-                        <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden bg-muted flex-shrink-0">
+                        <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-sm bg-muted sm:h-16 sm:w-16">
                           <Image
                             src={product.image || "/placeholder.svg"}
                             alt={product.name}
@@ -120,12 +120,20 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                 {product.badge}
                               </span>
                             )}
+                            {product.discountPercentage > 0 && (
+                              <span className="shrink-0 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                -{product.discountPercentage}%
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs sm:text-sm text-muted-foreground truncate">
                             Premium quality hair product
                           </p>
                           <p className="text-xs sm:text-sm font-medium text-foreground">
-                            {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(product.price) || 0)}
+                            {product.discountPercentage > 0 && (
+                              <span className="mr-2 text-muted-foreground line-through">{formatUsdPrice(product.price)}</span>
+                            )}
+                            {formatUsdPrice(getDiscountedPrice(product.price, product.discountPercentage))}
                           </p>
                         </div>
                       </Link>

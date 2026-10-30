@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
 
   const [resetBanner, setResetBanner] = useState(false)
   const [confirmErrorBanner, setConfirmErrorBanner] = useState(false)
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("adminn@gmail.com")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
@@ -49,23 +49,24 @@ export default function AdminLoginPage() {
 
   return (
     <AuthCard
+      variant="login"
       title="Admin Login"
       subtitle="Sign in with your email and password to manage products"
     >
       {resetBanner && (
-        <div className="bg-primary/10 text-primary text-sm rounded-full px-4 py-3 text-center mb-5">
+        <div className="mb-5 rounded-sm border border-border bg-muted px-4 py-3 text-center text-sm text-foreground">
           Your password has been reset. Sign in with your new password.
         </div>
       )}
 
       {confirmErrorBanner && (
-        <div className="bg-destructive/10 text-destructive text-sm rounded-full px-4 py-3 text-center mb-5">
+        <div className="mb-5 rounded-sm border border-destructive/20 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
           That confirmation link is invalid or has expired. Please try again.
         </div>
       )}
 
       {error && (
-        <div className="bg-destructive/10 text-destructive text-sm rounded-full px-4 py-3 text-center mb-5">
+        <div className="mb-5 rounded-sm border border-destructive/20 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
           {error}
         </div>
       )}
@@ -83,7 +84,7 @@ export default function AdminLoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             required
-            className="w-full bg-background border border-border rounded-full pl-4 pr-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+            className="min-h-12 w-full rounded-lg border border-[#e7e0d7] bg-[#fffdfa] px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-[#927451] focus:outline-none focus:ring-2 focus:ring-[#927451]/15 sm:text-base"
           />
         </div>
 
@@ -100,7 +101,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full bg-background border border-border rounded-full pl-4 pr-12 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+              className="min-h-12 w-full rounded-lg border border-[#e7e0d7] bg-[#fffdfa] py-3 pl-4 pr-12 text-sm text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-[#927451] focus:outline-none focus:ring-2 focus:ring-[#927451]/15 sm:text-base"
             />
             <button
               type="button"
@@ -116,7 +117,7 @@ export default function AdminLoginPage() {
         <div className="flex items-center justify-between text-sm">
           <Link
             href="/admin/forgot-password"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
           >
             Forgot your password?
           </Link>
@@ -125,7 +126,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#211b17] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#3a3028] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <>

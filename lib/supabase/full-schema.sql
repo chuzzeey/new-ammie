@@ -9,18 +9,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =====================================================
--- 1. MIGRATE OLD CATEGORY VALUES (if any exist)
--- =====================================================
-UPDATE public.products
-SET category = CASE
-  WHEN category = 'wigs' THEN 'ready_to_ship_braided_wigs'
-  WHEN category = 'extensions' THEN 'preorder_wigs'
-  WHEN category = 'lace' THEN 'human_hair_wigs'
-  ELSE category
-END
-WHERE category IN ('wigs', 'extensions', 'lace');
-
--- =====================================================
 -- 2. PRODUCTS TABLE
 -- =====================================================
 CREATE TABLE IF NOT EXISTS products (
@@ -32,14 +20,26 @@ CREATE TABLE IF NOT EXISTS products (
   category TEXT NOT NULL CHECK (category IN ('ready_to_ship_braided_wigs', 'preorder_wigs', 'human_hair_wigs')),
   sizes TEXT,
   rating DECIMAL(2, 1) DEFAULT 5.0,
-  review_count INTEGER DEFAULT 0,
+  discount_percentage INTEGER NOT NULL DEFAULT 0 CHECK (discount_percentage = 0 OR discount_percentage BETWEEN 5 AND 50),
   description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Drop old category constraint if it exists (for existing tables)
+-- Drop the previous category constraint before migrating legacy values.
 ALTER TABLE public.products DROP CONSTRAINT IF EXISTS products_category_check;
+
+-- =====================================================
+-- 1. MIGRATE OLD CATEGORY VALUES (if any exist)
+-- =====================================================
+UPDATE public.products
+SET category = CASE
+  WHEN category = 'wigs' THEN 'ready_to_ship_braided_wigs'
+  WHEN category = 'extensions' THEN 'preorder_wigs'
+  WHEN category = 'lace' THEN 'human_hair_wigs'
+  ELSE category
+END
+WHERE category IN ('wigs', 'extensions', 'lace');
 
 -- Add the new category constraint
 ALTER TABLE public.products
@@ -111,7 +111,6 @@ CREATE TABLE IF NOT EXISTS orders (
   shipping DECIMAL(10, 2) NOT NULL DEFAULT 0,
   total DECIMAL(10, 2) NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'cancelled')),
-  access_token TEXT NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -119,7 +118,11 @@ CREATE TABLE IF NOT EXISTS orders (
 -- Orders indexes
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_customer_phone ON orders(customer_phone);
-CREATE INDEX IF NOT EXISTS idx_orders_access_token ON orders(access_token);
+
+DROP FUNCTION IF EXISTS public.create_checkout_order(
+  TEXT, TEXT, TEXT, TEXT, TEXT, JSONB, NUMERIC, NUMERIC, NUMERIC
+);
+DROP FUNCTION IF EXISTS public.get_order_by_access_token(UUID, TEXT);
 
 -- =====================================================
 -- 6. ROW LEVEL SECURITY (RLS)
@@ -147,8 +150,11 @@ DROP POLICY IF EXISTS "Only authenticated admins can delete review comments" ON 
 
 DROP POLICY IF EXISTS "Anyone can insert orders" ON orders;
 DROP POLICY IF EXISTS "Anyone can view orders by ID" ON orders;
+DROP POLICY IF EXISTS "Anyone can view orders" ON orders;
 DROP POLICY IF EXISTS "Admins can update orders" ON orders;
 DROP POLICY IF EXISTS "Admins can delete orders" ON orders;
+DROP POLICY IF EXISTS "Checkout can create orders" ON orders;
+DROP POLICY IF EXISTS "Authenticated users can manage orders" ON orders;
 
 -- Products policies
 CREATE POLICY "Public can view products" ON products FOR SELECT USING (true);
@@ -169,10 +175,13 @@ CREATE POLICY "Only authenticated admins can update review comments" ON review_c
 CREATE POLICY "Only authenticated admins can delete review comments" ON review_comments FOR DELETE USING (auth.role() = 'authenticated');
 
 -- Orders policies
-CREATE POLICY "Anyone can insert orders" ON orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Anyone can view orders by ID" ON orders FOR SELECT USING (true);
-CREATE POLICY "Admins can update orders" ON orders FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Admins can delete orders" ON orders FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY "Checkout can create orders" ON orders FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Authenticated users can manage orders" ON orders FOR ALL TO authenticated
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+REVOKE ALL ON orders FROM anon, PUBLIC;
+GRANT SELECT, INSERT, UPDATE, DELETE ON orders TO authenticated;
 
 -- =====================================================
 -- 7. FUNCTIONS
@@ -196,23 +205,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_product_review_count(product_uuid UUID)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (
-    SELECT COALESCE(COUNT(*), 0)
-    FROM reviews
-    WHERE product_id = product_uuid AND is_approved = true
-  );
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION update_product_review_stats()
 RETURNS TRIGGER AS $$
+DECLARE
+  affected_product_id UUID;
 BEGIN
+  IF TG_OP = 'DELETE' OR (TG_OP = 'UPDATE' AND OLD.product_id IS DISTINCT FROM NEW.product_id) THEN
+    affected_product_id := OLD.product_id;
+    UPDATE products
+    SET rating = get_product_avg_rating(affected_product_id),
+        updated_at = NOW()
+    WHERE id = affected_product_id;
+  END IF;
+
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+
   UPDATE products
   SET
-    review_count = get_product_review_count(NEW.product_id),
     rating = get_product_avg_rating(NEW.product_id),
     updated_at = NOW()
   WHERE id = NEW.product_id;

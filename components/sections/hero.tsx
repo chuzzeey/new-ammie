@@ -21,11 +21,11 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden" style={{ backgroundColor: '#e3e1e2' }}>
-      <div className="absolute inset-0 border-b border-border/50 overflow-hidden xl:top-[8%] xl:h-[92%] xl:rounded-b-[2rem]">
-        <div className="hidden xl:flex h-full w-full gap-4 px-4">
+    <section className="relative flex min-h-[min(860px,92svh)] items-center overflow-hidden bg-[#121212]">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="hidden xl:flex h-full w-full gap-2">
           {desktopOrder.map((index) => (
-            <div key={`${heroImages[index]}-${index}`} className="h-full flex-1 overflow-hidden rounded-[1.5rem] transition-all duration-700 ease-in-out">
+            <div key={`${heroImages[index]}-${index}`} className="h-full flex-1 overflow-hidden transition-all duration-700 ease-in-out">
               <img
                 src={heroImages[index]}
                 alt="Ammie N premium hair collection"
@@ -51,30 +51,30 @@ export function Hero() {
           />
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-black/10 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/35 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-black/5" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full pt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-lg lg:max-w-xl mx-auto text-center lg:text-left">
-            <span className="text-sm uppercase mb-6 block text-black animate-blur-in opacity-0 tracking-normal" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-              Premium Hair & Extensions
+      <div className="relative z-10 w-full px-5 pb-24 pt-36 sm:px-8 lg:px-12 xl:pt-40">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="max-w-2xl text-left">
+            <span className="mb-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/85 animate-blur-in opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+              <span className="h-px w-8 bg-white/70" />
+              Premium hair, made for you
             </span>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.1] mb-6 text-black">
-              <span className="block animate-blur-in opacity-0 font-semibold" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>Wear confidence.</span>
-              <span className="block animate-blur-in opacity-0 font-semibold xl:text-9xl text-3xl sm:text-6xl md:text-7xl lg:text-8xl break-words" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>Naturally you.</span>
+            <h2 className="mb-6 font-sans text-5xl font-medium leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl md:text-7xl lg:text-[5.5rem]">
+              <span className="block animate-blur-in opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>Wear confidence.</span>
+              <span className="block animate-blur-in opacity-0 text-white/80" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>Naturally you.</span>
             </h2>
-            <p className="text-sm sm:text-base md:text-lg leading-relaxed mb-10 max-w-sm sm:max-w-md mx-auto text-black animate-blur-in opacity-0" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
-              Premium wigs and hair extensions crafted for beauty, comfort, and effortless style. Black
+            <p className="mb-9 max-w-lg text-base leading-7 text-white/85 sm:text-lg animate-blur-in opacity-0" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
+              Premium wigs and extensions crafted for beauty, comfort, and effortless style.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-blur-in opacity-0" style={{ animationDelay: '1s', animationFillMode: 'forwards' }}>
+            <div className="flex flex-col items-start gap-4 sm:flex-row animate-blur-in opacity-0" style={{ animationDelay: '1s', animationFillMode: 'forwards' }}>
               <Link
                 href="/shop"
-                className="group inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground px-8 py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow"
+                className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-white px-6 py-3 text-sm font-semibold text-foreground boty-transition hover:bg-white/90"
               >
-                Shop Now
+                Shop the collection
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 boty-transition" />
               </Link>
             </div>
@@ -83,10 +83,10 @@ export function Hero() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-black">
-        <span className="text-xs tracking-widest uppercase font-bold">Scroll</span>
-        <div className="w-px h-12 bg-foreground/20 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1/2 bg-foreground/60 animate-pulse" />
+      <div className="absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-white/80">
+        <span className="text-[10px] font-medium uppercase tracking-[0.2em]">Scroll</span>
+        <div className="relative h-8 w-px overflow-hidden bg-white/30">
+          <div className="absolute left-0 top-0 h-1/2 w-full animate-pulse bg-white" />
         </div>
       </div>
     </section>

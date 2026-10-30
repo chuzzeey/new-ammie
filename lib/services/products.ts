@@ -79,7 +79,6 @@ export async function getProducts(options: ProductListOptions = {}): Promise<Pro
  *   category: 'ready_to_ship_braided_wigs',
  *   images: ['video.mp4', 'img1.jpg'],
  *   rating: 4.5,
- *   review_count: 10,
  *   sizes: 'S,M,L'
  * })
  */

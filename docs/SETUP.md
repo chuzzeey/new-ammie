@@ -51,6 +51,22 @@ This has already been done.
 5. Click **Run** (or press Ctrl+Enter)
 6. You should see "Success. No rows returned"
 
+If the admin dashboard reports `Could not find the table 'public.products' in the schema cache`,
+run `lib/supabase/migrations/20261029_create_products_table.sql` in the same SQL editor,
+then refresh the app. This creates the missing products table and reloads the API schema cache.
+
+If Admin → Payments reports `Could not find the table 'public.orders' in the schema cache`,
+run this from the repository root to create the orders table and refresh the API schema:
+
+```bash
+supabase db query --linked --file lib/supabase/migrations/20261030_create_orders_table.sql
+```
+
+This provisions the orders table for admin payment activity. Checkout currently does
+not save an order or generate an invoice: until a payment gateway is configured, it
+shows a processing state and then returns the customer to the preserved checkout form.
+Admins can still review existing orders and mark them cancelled from **Admin → Payments → Order activity**.
+
 This will create:
 - `products` table with all necessary fields
 - Indexes for performance

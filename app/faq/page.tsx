@@ -11,15 +11,15 @@ const faqCategories = [
     questions: [
       {
         q: "How long does shipping take?",
-        a: "Ready to deliver wigs are processed within 3 to 5 business days. Processing time for custom orders varies depending on the style. Standard shipping takes 5 to 7 business days depending on the customer's location. Express shipping is available at checkout for faster delivery. All deliveries are handled by DHL."
+        a: "Ready to deliver wigs are processed within 3 to 5 business days. Processing time for custom orders varies by style. Standard shipping takes 5 to 7 business days, depending on your location. Express shipping is available at checkout for faster delivery. All deliveries are handled by DHL."
       },
       {
         q: "Is delivery door to door?",
-        a: "Yes. All deliveries are door to door through DHL. Tracking numbers will be provided after the order has been processed."
+        a: "Yes. DHL delivers directly to your address. We will provide a tracking number after your order has been processed."
       },
       {
         q: "How much is shipping?",
-        a: "Shipping rates vary depending on the customer's location and the weight of the order. The exact shipping cost will be shown at checkout before the order is completed. We offer free shipping on orders over $800. This does not apply to wholesale or bulk orders. Express shipping is available at an additional cost."
+        a: "Shipping rates depend on your location and the weight of your order. You will see the exact cost at checkout before completing your purchase. Free shipping is available on orders over $800, excluding wholesale and bulk orders. Express shipping is available at an additional cost."
       }
     ]
   },
@@ -28,15 +28,15 @@ const faqCategories = [
     questions: [
       {
         q: "What is your return policy?",
-        a: "Due to the hygienic nature of hair products, all sales of custom wigs, altered units, and sale items are final. For ready to ship wigs, we offer store credit or exchanges within 7 days of delivery, subject to a 25% restocking fee. To qualify, the security tag must be fully intact, the lace must be uncut, the wig must be completely unworn, and the unit must be free from perfumes, smoke, glue, or other smells. The customer is responsible for tracked return shipping. To start a return, email amysglamroom@gmail.com or contact us through the WhatsApp icon. Once the return is approved, we will provide the return shipping address and a Return Authorization Number. The package must be mailed back within 3 business days of receiving approval. Once the returned unit is received, please allow 3 to 5 business days for our team to inspect the unit and issue store credit or process the exchange."
+        a: "Because of the hygienic nature of hair products, all sales of custom wigs, altered units, and sale items are final. Ready to ship wigs may qualify for store credit or an exchange within 7 days of delivery, with a 25% restocking fee. To qualify, the security tag must be fully intact, the lace must be uncut, and the wig must be completely unworn and free from perfume, smoke, glue, or other odors. You are responsible for tracked return shipping. To request a return, email amysglamroom@gmail.com or contact us through WhatsApp. If your request is approved, we will provide the return address and a Return Authorization Number. Please mail the package within 3 business days of approval. After we receive the wig, allow 3 to 5 business days for inspection and for us to issue store credit or process your exchange."
       },
       {
         q: "Can I exchange my wig?",
-        a: "Yes. Exchanges are available for eligible ready to ship wigs within 7 days of delivery. The customer is responsible for tracked return shipping. The new item will be shipped at the full current delivery cost. Custom wigs, altered units, and sale items are not eligible for exchanges."
+        a: "Yes. Eligible ready to ship wigs may be exchanged within 7 days of delivery. You are responsible for tracked return shipping, and the new item will be shipped at the current delivery cost. Custom wigs, altered units, and sale items are not eligible for exchanges."
       },
       {
         q: "Can I get a refund?",
-        a: "We do not offer refunds on custom wigs, altered units, or sale items. Eligible ready to ship wigs may qualify for store credit or an exchange within 7 days of delivery, subject to the return conditions and a 25% restocking fee."
+        a: "We do not offer refunds on custom wigs, altered units, or sale items. Eligible ready to ship wigs may qualify for store credit or an exchange within 7 days of delivery, subject to the return conditions and 25% restocking fee."
       }
     ]
   },
@@ -45,7 +45,7 @@ const faqCategories = [
     questions: [
       {
         q: "What if my wig arrives damaged or defective?",
-        a: "We inspect every unit before shipping, but damage can sometimes occur during transit. Please inspect your package immediately after delivery. If your item arrives damaged or defective, contact us at amysglamroom@gmail.com within 48 hours of delivery. You must provide your order number, clear photos of the damaged shipping box, and clear photos or videos showing the specific defect. Do not cut the lace, alter the unit, or throw away the original packaging. Valid claims will receive a complimentary replacement at a 40% discount with no additional delivery cost. Claims submitted after 48 hours or without the required photographic proof will not be accepted."
+        a: "We inspect every unit before shipping, but damage can sometimes happen in transit. Please check your package as soon as it arrives. If your item is damaged or defective, email amysglamroom@gmail.com within 48 hours of delivery. Include your order number, clear photos of the damaged shipping box, and clear photos or videos showing the defect. Please keep the original packaging, and do not cut the lace or alter the wig. Approved claims qualify for a replacement at a 40% discount, with no additional delivery cost. We cannot accept claims submitted after 48 hours or without the required photos or videos."
       }
     ]
   },
@@ -54,7 +54,7 @@ const faqCategories = [
     questions: [
       {
         q: "What happens if you send me the wrong item?",
-        a: "If our team made the mistake, you may qualify for a replacement, exchange, or store credit depending on the situation. Qualifying errors are strictly limited to: Wrong Item Sent — you received a completely different wig style or texture from what is listed on your original invoice. Wrong Cap Size Sent — you ordered a specific cap size but received a different cap size. This policy applies to custom orders and does not apply to ready to ship or sale items. To qualify, contact us at amysglamroom@gmail.com or through WhatsApp within 48 hours of delivery. You must provide your order number, clear photos, and a video of the unboxing. The security tag must remain fully intact and the wig must remain unworn and unaltered. If we confirm the error was made by our team, we will provide prepaid return shipping and issue a replacement after receiving and inspecting the unit."
+        a: "If we made a mistake, you may qualify for a replacement, exchange, or store credit. This policy covers two situations: you received a different wig style or texture from the one on your invoice, or you received a different cap size from the one you ordered. It applies to custom orders, but not to ready to ship or sale items. Contact us at amysglamroom@gmail.com or through WhatsApp within 48 hours of delivery. Include your order number, clear photos, and a video of the unboxing. The security tag must remain intact, and the wig must be unworn and unaltered. If we confirm the error, we will provide prepaid return shipping and send a replacement after receiving and inspecting the wig."
       }
     ]
   },
@@ -63,7 +63,7 @@ const faqCategories = [
     questions: [
       {
         q: "How do I care for my wig?",
-        a: "Wash your wig every 6 to 8 wears using sulfate free shampoo and conditioner. Use cool water and avoid rubbing or twisting the hair. Apply a leave in conditioner and allow the wig to air dry on a wig stand. When not in use, store the wig on a wig stand or in a silk bag."
+        a: "Wash your wig every 6 to 8 wears with sulfate free shampoo and conditioner. Use cool water, and avoid rubbing or twisting the hair. Apply a leave in conditioner and let the wig air dry on a wig stand. When you are not wearing it, store the wig on a stand or in a silk bag."
       }
     ]
   },
@@ -72,7 +72,7 @@ const faqCategories = [
     questions: [
       {
         q: "What type of hair do you use?",
-        a: "We use 100% virgin human hair for our closures, frontals, full lace wigs, and hair extensions. Our human hair can be styled, colored, and treated similarly to natural hair. For braiding, we use kanekalon or synthetic fiber hair."
+        a: "We use 100% virgin human hair for our closures, frontals, full lace wigs, and hair extensions. You can style, color, and care for the human hair much like your own hair. For braiding, we use Kanekalon or synthetic fiber hair."
       }
     ]
   },
@@ -81,11 +81,11 @@ const faqCategories = [
     questions: [
       {
         q: "How do I choose the right size?",
-        a: "Please refer to our size chart. Our wigs come in standard sizes with adjustable straps. If you are between sizes or have a larger head circumference, please contact us for custom sizing options."
+        a: "Use our size chart to find your fit. Our wigs come in standard sizes with adjustable straps. If you are between sizes or have a larger head circumference, contact us about custom sizing."
       },
       {
         q: "Are the wigs adjustable?",
-        a: "Yes. Our wigs feature adjustable straps and combs inside the cap, allowing you to customize the fit for comfort and security. Most wigs fit head circumferences between 21 and 23 inches."
+        a: "Yes. Our wigs have adjustable straps and combs inside the cap to help you find a comfortable, secure fit. Most wigs fit head circumferences between 21 and 23 inches."
       }
     ]
   },
@@ -94,7 +94,7 @@ const faqCategories = [
     questions: [
       {
         q: "Can I style my wig with heat tools?",
-        a: "Yes. Our 100% virgin human hair wigs can be styled using heat tools. For curly textures, we recommend limiting heating to help preserve the texture. Kanekalon and synthetic fiber hair should only be exposed to heat or hot water when the specific product is designed to handle it."
+        a: "Yes. You can use heat tools on our 100% virgin human hair wigs. Use less heat on curly textures to help preserve the curl pattern. Only use heat or hot water on Kanekalon and synthetic fiber hair if the product is specifically made to handle it."
       }
     ]
   },
@@ -103,7 +103,7 @@ const faqCategories = [
     questions: [
       {
         q: "How long will my wig last?",
-        a: "With proper care, our wigs can last 1 to 3 years or longer. The lifespan depends on how frequently the wig is worn, how well it is maintained, and the products used on it. Following our wig care instructions will help maximize its longevity."
+        a: "With proper care, our wigs can last 1 to 3 years or longer. How long yours lasts depends on how often you wear it, how you care for it, and which products you use. Following our wig care instructions can help extend its life."
       }
     ]
   }
@@ -169,40 +169,40 @@ export default function FAQPage() {
     <main className="min-h-screen">
       <Header />
 
-      <div className="pt-28 pb-20">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+      <div className="pb-20 pt-32 sm:pt-40">
+      <div className="mx-auto max-w-4xl px-5 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-16">
-            <span className="text-sm tracking-[0.3em] uppercase text-primary mb-4 block">
+        <div className="mb-12 max-w-3xl">
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               Got Questions?
             </span>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-4 text-balance">
+          <h1 className="mb-4 font-sans text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
               Frequently Asked Questions
             </h1>
-            <p className="text-lg text-muted-foreground max-w-lg mx-auto">
+          <p className="max-w-lg text-base leading-7 text-muted-foreground">
               Everything you need to know about our products, shipping, returns, and more
             </p>
           </div>
 
           {/* FAQ Categories */}
-          <div className="space-y-16">
+          <div className="space-y-12">
             {faqCategories.map((category) => (
               <section key={category.title}>
-                <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-8 pb-4 border-b border-border/50">
+                <h2 className="mb-2 border-b border-border pb-3 font-sans text-lg font-semibold text-foreground">
                   {category.title}
                 </h2>
-                <div className="space-y-4">
+                <div className="divide-y divide-border">
                   {category.questions.map((item, index) => (
                     <details
                       key={index}
-                      className="group bg-card rounded-2xl boty-shadow overflow-hidden boty-transition open:bg-card"
+                      className="group overflow-hidden"
                     >
-                      <summary className="flex items-center justify-between gap-4 p-5 md:p-6 cursor-pointer list-none text-foreground font-medium hover:text-primary boty-transition">
-                        <span className="text-sm md:text-base">{item.q}</span>
-                        <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0 boty-transition group-open:rotate-180" />
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-foreground transition-colors hover:text-muted-foreground">
+                        <span className="text-sm font-medium sm:text-base">{item.q}</span>
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
                       </summary>
-                      <div className="px-5 md:px-6 pb-5 md:pb-6">
-                        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                      <div className="pb-5 pr-8">
+                        <p className="text-sm leading-6 text-muted-foreground">
                           {renderWithEmails(item.a)}
                         </p>
                       </div>
@@ -214,16 +214,16 @@ export default function FAQPage() {
           </div>
 
           {/* Still have questions */}
-          <div className="mt-20 text-center bg-card rounded-3xl p-10 md:p-14 boty-shadow">
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-4">
+          <div className="mt-16 rounded-md bg-muted p-6 sm:p-10">
+            <h2 className="mb-2 font-sans text-xl font-medium text-foreground sm:text-2xl">
               Still have questions?
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+            <p className="mb-6 max-w-md text-sm leading-6 text-muted-foreground">
               Can't find the answer you're looking for? Please reach out to our friendly team.
             </p>
             <a
               href="mailto:amysglamroom@gmail.com"
-              className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-primary/90 boty-shadow"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Contact Support
             </a>

@@ -7,6 +7,8 @@ export interface CartItem {
   id: string
   name: string
   price: number
+  originalPrice?: number
+  discountPercentage?: number
   quantity: number
   image: string
 }

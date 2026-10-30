@@ -52,25 +52,25 @@ export function TrustBadges() {
   }, [])
 
   return (
-    <section className="py-20 bg-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="bg-background py-10 sm:py-14">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div 
           ref={sectionRef}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
+          className="grid grid-cols-2 divide-x divide-y divide-border/80 border-y border-border/80 sm:grid-cols-4 sm:divide-y-0"
         >
           {badges.map((badge, index) => (
             <div
               key={badge.title}
-              className={`bg-background p-3 md:p-6 lg:p-8 text-center rounded-xl border border-stone-200 transition-all duration-700 ease-out border-none ${
+              className={`px-3 py-5 text-center transition-all duration-700 ease-out sm:px-5 sm:py-7 ${
                 isVisible 
                   ? 'opacity-100 translate-y-0' 
                   : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: `${index * 150}ms` }}
             >
-              <badge.icon className="text-primary mb-2 md:mb-4 mx-auto size-8 md:size-12" strokeWidth={1} />
-              <h3 className="font-serif text-foreground mb-1 md:mb-2 text-sm md:text-2xl">{badge.title}</h3>
-              <p className="text-[10px] md:text-sm text-muted-foreground">{badge.description}</p>
+              <badge.icon className="mb-3 mx-auto size-6 text-primary sm:size-7" strokeWidth={1.5} />
+              <h3 className="mb-1 text-xs font-medium text-foreground sm:text-sm">{badge.title}</h3>
+              <p className="text-[10px] leading-4 text-muted-foreground sm:text-xs">{badge.description}</p>
             </div>
           ))}
         </div>

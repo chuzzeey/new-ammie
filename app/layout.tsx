@@ -1,26 +1,15 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/components/providers/cart-context'
 import { SearchBlurProvider } from '@/components/providers/search-blur-context'
 import { WhatsAppButton } from '@/components/layout/whatsapp-button'
+import { BrandLoader } from '@/components/layout/brand-loader'
 import { Toaster } from '@/components/ui/sonner'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { LenisProvider } from '@/components/providers/lenis-provider'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 import './globals.css'
-
-const dmSans = DM_Sans({ 
-  subsets: ["latin"],
-  variable: '--font-dm-sans',
-  weight: ['300', '400', '500', '600']
-});
-
-const playfairDisplay = Playfair_Display({ 
-  subsets: ["latin"],
-  variable: '--font-playfair',
-  weight: ['400', '500', '600', '700']
-});
 
 export const metadata: Metadata = {
   title: 'Ammie N — Premium Hair & Extensions',
@@ -34,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F7F4EF',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -48,19 +37,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${playfairDisplay.variable} font-sans antialiased`}>
-        <QueryProvider>
-          <CartProvider>
-            <SearchBlurProvider>
-              <LenisProvider>
-                {children}
-              </LenisProvider>
-            </SearchBlurProvider>
-          </CartProvider>
-        </QueryProvider>
-        <WhatsAppButton />
-        <Analytics />
-        <Toaster />
+      <body className="font-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <BrandLoader />
+          <QueryProvider>
+            <CartProvider>
+              <SearchBlurProvider>
+                <LenisProvider>
+                  {children}
+                </LenisProvider>
+              </SearchBlurProvider>
+            </CartProvider>
+          </QueryProvider>
+          <WhatsAppButton />
+          <Analytics />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -7,16 +7,16 @@ const YOUTUBE_URL = "https://www.youtube.com/@AmmieStore"
 
 export function Newsletter() {
   return (
-    <section className="py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <span className="text-sm tracking-[0.3em] uppercase text-primary mb-4 block">
+    <section className="bg-background py-14 sm:py-20">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mx-auto max-w-3xl rounded-md bg-primary px-6 py-12 text-center text-primary-foreground sm:px-12 sm:py-16">
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.16em] text-primary-foreground/75">
             Join us on YouTube
           </span>
-          <h2 className="font-serif text-4xl leading-tight text-foreground mb-6 text-balance md:text-7xl">
-            Subscribe to our YouTube
+          <h2 className="mb-4 font-sans text-3xl font-medium leading-tight tracking-tight text-balance sm:text-4xl md:text-5xl">
+            Get inspired by Ammie
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+          <p className="mx-auto mb-8 max-w-xl text-sm leading-6 text-primary-foreground/80 sm:text-base">
             Watch tutorials, styling tips, and behind-the-scenes content from the Ammie family.
           </p>
 
@@ -24,7 +24,7 @@ export function Newsletter() {
             href={YOUTUBE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-3 bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-full text-sm tracking-wide transition-all duration-300"
+            className="group inline-flex min-h-11 items-center justify-center gap-3 rounded-md bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-background/90"
           >
             {/* YouTube Icon */}
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

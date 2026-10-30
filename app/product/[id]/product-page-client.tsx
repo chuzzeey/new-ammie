@@ -15,6 +15,7 @@ import { getOptimizedProductImage } from "@/lib/cloudinary/image-utils"
 import { type ReviewComment } from "@/components/sections/reviews-data"
 import { isVideoUrl, getSafeVideoUrl } from "@/lib/cloudinary"
 import { ThumbnailVideo } from "./components/thumbnail-video"
+import { getDiscountedPrice } from "@/lib/utils/product-pricing"
 
 const benefits = [
   { icon: Leaf, label: "100% Human Hair" },
@@ -268,11 +269,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
     })
   }, [product, selectedImageIndex, realImages])
 
-  const thumbnailSlots = (() => {
-    const slots = [...realImages]
-    while (slots.length < 5) slots.push("")
-    return slots.slice(0, 5)
-  })()
+  const thumbnailSlots = realImages.slice(0, 5)
 
   const toggleAccordion = (section: AccordionSection) => {
     setOpenAccordion(openAccordion === section ? null : section)
@@ -284,7 +281,9 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: getDiscountedPrice(product.price, product.discount_percentage),
+      originalPrice: product.discount_percentage > 0 ? product.price : undefined,
+      discountPercentage: product.discount_percentage || undefined,
       image: getOptimizedProductImage(realImages[0] || "/placeholder.svg", "card")
     })
     setTimeout(() => setIsAdded(false), 2000)
@@ -295,7 +294,9 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: getDiscountedPrice(product.price, product.discount_percentage),
+      originalPrice: product.discount_percentage > 0 ? product.price : undefined,
+      discountPercentage: product.discount_percentage || undefined,
       image: getOptimizedProductImage(realImages[0] || "/placeholder.svg", "card")
     })
     setIsOpen(true)
@@ -374,6 +375,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
   }
 
   const sizesArray = product.sizes ? product.sizes.split(',').map((s) => s.trim()) : []
+  const discountedPrice = getDiscountedPrice(product.price, product.discount_percentage)
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -387,7 +389,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
       "@type": "Offer",
       "url": `https://ammiestore.com/product/${product.id}`,
       "priceCurrency": "USD",
-      "price": product.price.toString(),
+      "price": discountedPrice.toString(),
       "itemCondition": "https://schema.org/NewCondition",
       "availability": "https://schema.org/InStock",
       "shippingDetails": {
@@ -401,10 +403,9 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
         "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "NG" }
       }
     },
-    "aggregateRating": product.review_count > 0 ? {
+    "aggregateRating": product.rating > 0 ? {
       "@type": "AggregateRating",
-      "ratingValue": product.rating.toString(),
-      "reviewCount": product.review_count.toString()
+      "ratingValue": product.rating.toString()
     } : undefined
   }
 
@@ -412,18 +413,17 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
-      <div className="pt-28 pb-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground boty-transition mb-8">
-            <ChevronLeft className="w-4 h-4" />
-            Back to Shop
+      <div className="pb-20 pt-32 sm:pt-40">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <Link href="/shop" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <ChevronLeft className="h-4 w-4" />
+            All products
           </Link>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20">
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="flex flex-col gap-4">
-              <div className="flex gap-4 items-stretch">
+              <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row">
                 <div
-                  className="relative flex-1 rounded-3xl overflow-hidden bg-card boty-shadow group touch-pan-y"
-                  style={{ minHeight: '400px' }}
+                  className="group relative aspect-[4/5] flex-1 touch-pan-y overflow-hidden rounded-md border border-border bg-muted"
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
@@ -444,19 +444,27 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
                       priority
                     />
                   )}
+                  {product.discount_percentage > 0 && (
+                    <span
+                      aria-label={`Save ${product.discount_percentage}%`}
+                      className="absolute right-3 top-3 z-10 rounded-sm bg-red-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white"
+                    >
+                      Save {product.discount_percentage}%
+                    </span>
+                  )}
                 </div>
                 {realImages.length > 0 && (
-                  <div className="flex flex-col gap-3 shrink-0">
+                  <div className="flex shrink-0 gap-2 overflow-x-auto sm:flex-col sm:gap-3">
                     {thumbnailSlots.map((img, index) =>
                       img ? (
                         <button
                           key={index}
                           type="button"
                           onClick={() => setSelectedImageIndex(index)}
-                          className={`relative w-16 h-16 md:w-[76px] md:h-[76px] rounded-xl overflow-hidden boty-transition ${
+                          className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border sm:h-[76px] sm:w-[76px] ${
                             selectedImageIndex === index
-                              ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                              : "opacity-60 hover:opacity-100"
+                              ? "border-foreground"
+                              : "border-transparent opacity-65 hover:opacity-100"
                           }`}
                         >
                           {isVideoUrl(img) ? (
@@ -473,7 +481,7 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
                           )}
                         </button>
                       ) : (
-                        <div key={index} className="w-16 h-16 md:w-[76px] md:h-[76px] rounded-xl bg-card" />
+                        <div key={index} className="h-16 w-16 shrink-0 rounded-sm bg-muted sm:h-[76px] sm:w-[76px]" />
                       )
                     )}
                   </div>
@@ -493,43 +501,50 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
                 </div>
               )}
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col lg:sticky lg:top-32">
               <div className="mb-8">
-                <span className="text-sm tracking-[0.3em] uppercase text-primary mb-2 block">Ammie Hair</span>
-                <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-3">{product.name}</h1>
-                <div className="flex items-center gap-2 mb-4">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Ammie N</span>
+                <h1 className="mb-3 font-sans text-3xl font-medium tracking-tight text-foreground sm:text-4xl">{product.name}</h1>
+                <div className="mb-4 flex items-center gap-2">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${i < product.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground/30"}`} />
+                      <Star key={i} className={`h-4 w-4 ${i < product.rating ? "fill-amber-400 text-amber-400" : "fill-transparent text-muted-foreground/30"}`} />
                     ))}
                   </div>
-                  <span className="text-sm text-muted-foreground">({product.review_count} reviews)</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleViewProductComments}
-                  className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
                 >
                   <MessageCircle className="w-4 h-4" />
                   View Comments
                 </button>
-                <p className="text-foreground/80 leading-relaxed">
+                <p className="mt-4 text-sm leading-6 text-muted-foreground">
                   {product.description || `${product.name} is a premium quality hair product designed to enhance your natural beauty and elevate your style`}
                 </p>
               </div>
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-3xl font-medium text-foreground">{formatUsdPrice(product.price)}</span>
+              <div className="mb-7 flex items-center gap-3">
+                {product.discount_percentage > 0 && (
+                  <>
+                    <span className="rounded-sm bg-red-600 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+                    Save {product.discount_percentage}%
+                    </span>
+                    <span className="text-base text-muted-foreground line-through">{formatUsdPrice(product.price)}</span>
+                  </>
+                )}
+                <span className="text-2xl font-medium text-foreground">{formatUsdPrice(discountedPrice)}</span>
               </div>
               {sizesArray.length > 0 && (
                 <div className="mb-6">
                   <label className="text-sm font-medium text-foreground mb-3 block">Size</label>
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-2">
                     {sizesArray.map((size) => (
                       <button
                         key={size}
                         type="button"
                         onClick={() => setSelectedSize(size)}
-                        className={`px-6 py-3 rounded-full text-sm boty-transition boty-shadow ${selectedSize === size ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-card/80"}`}
+                        className={`min-h-10 rounded-sm border px-4 py-2 text-sm transition-colors ${selectedSize === size ? "border-foreground bg-foreground text-background" : "border-border bg-background text-foreground hover:border-foreground"}`}
                       >
                         {size}
                       </button>
@@ -539,25 +554,25 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
               )}
               <div className="mb-8">
                 <label className="text-sm font-medium text-foreground mb-3 block">Quantity</label>
-                <div className="inline-flex items-center gap-4 bg-card rounded-full px-2 py-2 boty-shadow">
-                  <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition" aria-label="Decrease quantity">
+                <div className="inline-flex items-center gap-1 rounded-sm border border-border p-1">
+                  <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground" aria-label="Decrease quantity">
                     <Minus className="w-4 h-4" />
                   </button>
                   <span className="w-8 text-center font-medium text-foreground">{quantity}</span>
-                  <button type="button" onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-foreground/60 hover:text-foreground boty-transition" aria-label="Increase quantity">
+                  <button type="button" onClick={() => setQuantity(quantity + 1)} className="flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground" aria-label="Increase quantity">
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <div className="mb-8 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm tracking-wide boty-transition boty-shadow cursor-pointer ${isAdded ? "bg-primary/80 text-primary-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+                  className={`inline-flex min-h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-medium transition-colors ${isAdded ? "bg-primary/80 text-primary-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
                 >
                   {isAdded ? (<><Check className="w-4 h-4" /> Added to Cart</>) : "Add to Cart"}
                 </button>
-                <button type="button" onClick={handleBuyNow} className="flex-1 inline-flex items-center justify-center gap-2 bg-transparent border border-primary text-primary px-8 py-4 rounded-full text-sm tracking-wide boty-transition hover:bg-primary hover:text-primary-foreground cursor-pointer">
+                <button type="button" onClick={handleBuyNow} className="inline-flex min-h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-sm border border-foreground px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">
                   Buy Now
                 </button>
               </div>
@@ -598,31 +613,56 @@ export function ProductPageClient({ productId, initialProduct, initialSuggestion
         </div>
       </div>
       {suggestions.length > 0 && (
-        <section className="py-20 bg-background">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="font-serif text-3xl md:text-4xl text-foreground">You May Also Like</h2>
+        <section className="bg-muted py-14 sm:py-20">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <div className="mb-8 sm:mb-10">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">More to explore</p>
+              <h2 className="font-sans text-2xl font-medium tracking-tight text-foreground sm:text-3xl">You may also like</h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
               {suggestions.map((suggestion) => (
-                <div key={suggestion.id} className="group transition-all duration-500 ease-out opacity-100 scale-100">
-                  <Link href={`/product/${suggestion.id}`}>
-                    <div className="bg-background rounded-3xl overflow-hidden boty-shadow boty-transition group-hover:scale-[1.02]">
-                      <div className="relative aspect-square bg-muted overflow-hidden">
-                        <Image src={getOptimizedProductImage(suggestion.images[0] || "/placeholder.svg", "card")} alt={suggestion.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover boty-transition group-hover:scale-105" />
-                      </div>
-                      <div className="p-3 md:p-5 pb-4">
-                        <h3 className="font-serif text-sm md:text-lg text-foreground mb-0.5 md:mb-1">{suggestion.name}</h3>
-                        <div className="flex items-center gap-2 mb-2 md:mb-3">
-                          <span className="text-xs md:text-base font-medium text-foreground">{formatUsdPrice(suggestion.price)}</span>
-                        </div>
-                        <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation() }} className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3 py-1.5 md:px-4 md:py-2.5 rounded-full text-[10px] md:text-xs tracking-wide boty-transition hover:bg-primary/90 boty-shadow">
-                          Add to Cart
-                        </button>
-                      </div>
+                <article key={suggestion.id} className="group">
+                  <Link href={`/product/${suggestion.id}`} aria-label={`View ${suggestion.name}`}>
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-background">
+                      <Image src={getOptimizedProductImage(suggestion.images[0] || "/placeholder.svg", "card")} alt={suggestion.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                      {suggestion.discount_percentage > 0 && (
+                        <span
+                          aria-label={`Save ${suggestion.discount_percentage}%`}
+                          className="absolute right-3 top-3 rounded-sm bg-red-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white"
+                        >
+                          Save {suggestion.discount_percentage}%
+                        </span>
+                      )}
                     </div>
                   </Link>
-                </div>
+                  <div className="pt-3">
+                    <Link href={`/product/${suggestion.id}`} className="flex items-start justify-between gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                      <span className="text-sm font-medium leading-5 text-foreground hover:underline">
+                        {suggestion.name}
+                      </span>
+                      <span className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-foreground">
+                        {suggestion.discount_percentage > 0 && (
+                          <span className="text-xs text-muted-foreground line-through">{formatUsdPrice(suggestion.price)}</span>
+                        )}
+                        {formatUsdPrice(getDiscountedPrice(suggestion.price, suggestion.discount_percentage))}
+                      </span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => addItem({
+                        id: suggestion.id,
+                        name: suggestion.name,
+                        price: getDiscountedPrice(suggestion.price, suggestion.discount_percentage),
+                        originalPrice: suggestion.discount_percentage > 0 ? suggestion.price : undefined,
+                        discountPercentage: suggestion.discount_percentage || undefined,
+                        image: getOptimizedProductImage(suggestion.images[0] || "/placeholder.svg", "card"),
+                      })}
+                      className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-sm border border-foreground/20 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-foreground hover:text-background"
+                    >
+                      Quick add
+                    </button>
+                  </div>
+                </article>
               ))}
             </div>
           </div>

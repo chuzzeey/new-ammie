@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { X, Plus } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 
 interface PricingFormProps {
   price: string
@@ -94,7 +94,7 @@ export default function PricingForm({ price, sizes, onSizesChange, onChange }: P
           onChange={(e) => onChange("price", e.target.value.replace(/[^0-9]/g, ""))}
           placeholder="220.00"
           required
-          className="w-full bg-card border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary"
+          className="min-h-11 w-full rounded-sm border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
         />
       </div>
 
@@ -170,27 +170,37 @@ export default function PricingForm({ price, sizes, onSizesChange, onChange }: P
         </div>
       )}
 
-      {/* Quick Select */}
+      {/* Size selector */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-3 block">
-          Quick Select <span className="text-muted-foreground font-normal">(tap to toggle)</span>
+        <label className="text-sm font-medium text-foreground mb-2 block">
+          Available Sizes
         </label>
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-          {availableSizes.map((size) => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => handleSizeToggle(size)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium boty-transition boty-shadow ${
-                sizes.includes(size)
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-foreground hover:bg-card/80"
-              }`}
-            >
-              {size}"
-            </button>
-          ))}
-        </div>
+        <details className="group relative">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-sm border border-border bg-background px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground [&::-webkit-details-marker]:hidden">
+            <span>
+              {sizes.length > 0
+                ? `${sizes.length} size${sizes.length === 1 ? "" : "s"} selected`
+                : "Choose sizes"}
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="absolute left-0 right-0 top-full z-20 mt-1 grid grid-cols-3 gap-2 rounded-sm border border-border bg-background p-3 shadow-lg">
+            {availableSizes.map((size) => (
+              <label
+                key={size}
+                className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm text-foreground hover:bg-muted"
+              >
+                <input
+                  type="checkbox"
+                  checked={sizes.includes(size)}
+                  onChange={() => handleSizeToggle(size)}
+                  className="h-4 w-4 accent-primary"
+                />
+                <span>{size}&quot;</span>
+              </label>
+            ))}
+          </div>
+        </details>
       </div>
     </div>
   )
